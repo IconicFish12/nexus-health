@@ -10,6 +10,51 @@
   "monorepo": true,
   "root": "apps/nexus-health",
   "projects": {
+    "appointment-service": {
+      "type": "application",
+      "root": "apps/appointment-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/appointment-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/appointment-service/tsconfig.app.json"
+      }
+    },
+    "auth-service": {
+      "type": "application",
+      "root": "apps/auth-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/auth-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/auth-service/tsconfig.app.json"
+      }
+    },
+    "billing-service": {
+      "type": "application",
+      "root": "apps/billing-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/billing-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/billing-service/tsconfig.app.json"
+      }
+    },
+    "common": {
+      "type": "library",
+      "root": "libs/common",
+      "entryFile": "index",
+      "sourceRoot": "libs/common/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/common/tsconfig.lib.json"
+      }
+    },
+    "hr-management": {
+      "type": "application",
+      "root": "apps/hr-management",
+      "entryFile": "main",
+      "sourceRoot": "apps/hr-management/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/hr-management/tsconfig.app.json"
+      }
+    },
     "nexus-health": {
       "type": "application",
       "root": "apps/nexus-health",
@@ -19,13 +64,49 @@
         "tsConfigPath": "apps/nexus-health/tsconfig.app.json"
       }
     },
-    "services": {
+    "notification-service": {
       "type": "application",
-      "root": "apps/services",
+      "root": "apps/notification-service",
       "entryFile": "main",
-      "sourceRoot": "apps/services/src",
+      "sourceRoot": "apps/notification-service/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/services/tsconfig.app.json"
+        "tsConfigPath": "apps/notification-service/tsconfig.app.json"
+      }
+    },
+    "patient-emr-service": {
+      "type": "application",
+      "root": "apps/patient-emr-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/patient-emr-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/patient-emr-service/tsconfig.app.json"
+      }
+    },
+    "pharmacy-service": {
+      "type": "application",
+      "root": "apps/pharmacy-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/pharmacy-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/pharmacy-service/tsconfig.app.json"
+      }
+    },
+    "proto": {
+      "type": "library",
+      "root": "libs/proto",
+      "entryFile": "index",
+      "sourceRoot": "libs/proto/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/proto/tsconfig.lib.json"
+      }
+    },
+    "ward-service": {
+      "type": "application",
+      "root": "apps/ward-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/ward-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/ward-service/tsconfig.app.json"
       }
     }
   }

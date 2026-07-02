@@ -1,8 +1,8 @@
 {
   "name": "nexus-health",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "version": "1.0.0",
+  "description": "Nexus healthcare system management is a backen based project focusing on a modern hospital information management system",
+  "author": "IconicFish1212 - Ibnu Syawal Aliefian",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -36,6 +36,7 @@
     "@nestjs/websockets": "^11.1.27",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "@protobuf-ts/plugin": "^2.11.1",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.79.2",
     "cache-manager": "^7.2.9",
@@ -47,6 +48,7 @@
     "passport-local": "^1.0.0",
     "pg": "^8.22.0",
     "pino": "^10.3.1",
+    "protoc": "^35.1.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "vitest": "^4.1.9"
@@ -101,7 +103,12 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/apps/"
-    ]
+      "<rootDir>/apps/",
+      "<rootDir>/libs/"
+    ],
+    "moduleNameMapper": {
+      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
+      "^@app/proto(|/.*)$": "<rootDir>/libs/proto/src/$1"
+    }
   }
 }
