@@ -46,13 +46,22 @@
         "tsConfigPath": "libs/common/tsconfig.lib.json"
       }
     },
-    "hr-management": {
+    "hr-service": {
       "type": "application",
-      "root": "apps/hr-management",
+      "root": "apps/hr-service",
       "entryFile": "main",
-      "sourceRoot": "apps/hr-management/src",
+      "sourceRoot": "apps/hr-service/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/hr-management/tsconfig.app.json"
+        "tsConfigPath": "apps/hr-service/tsconfig.app.json"
+      }
+    },
+    "inventory-service": {
+      "type": "application",
+      "root": "apps/inventory-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/inventory-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/inventory-service/tsconfig.app.json"
       }
     },
     "nexus-health": {

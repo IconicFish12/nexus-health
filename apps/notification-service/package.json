@@ -1,0 +1,50 @@
+{
+  "name": "notification-service",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/js": "^10.0.1",
+    "@nestjs/testing": "^11.1.27",
+    "@swc/cli": "^0.8.1",
+    "@swc/core": "^1.15.43",
+    "@types/bun": "latest",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.1.0",
+    "eslint": "^10.6.0",
+    "tsx": "^4.23.0",
+    "vitest": "^4.1.10"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.4",
+    "@grpc/proto-loader": "^0.8.1",
+    "@grpc/reflection": "^1.0.4",
+    "@nestjs/bullmq": "^11.0.4",
+    "@nestjs/common": "^11.1.27",
+    "@nestjs/config": "^4.0.4",
+    "@nestjs/core": "^11.1.27",
+    "@nestjs/microservices": "^11.1.27",
+    "@nestjs/platform-express": "^11.1.27",
+    "@nestjs/platform-socket.io": "^11.1.27",
+    "@nestjs/terminus": "^11.1.1",
+    "@nestjs/websockets": "^11.1.27",
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.220.0",
+    "@opentelemetry/instrumentation-express": "^0.68.0",
+    "@opentelemetry/instrumentation-fs": "^0.39.0",
+    "@opentelemetry/instrumentation-http": "^0.220.0",
+    "@opentelemetry/sdk-node": "^0.220.0",
+    "bullmq": "^5.79.2",
+    "cache-manager": "^7.2.9",
+    "dotenv": "^17.4.2",
+    "grpc-health-check": "^2.1.0",
+    "ioredis": "^5.11.1",
+    "reflect-metadata": "^0.2.2",
+    "resend": "^6.17.1",
+    "rxjs": "^7.8.2"
+  }
+}
