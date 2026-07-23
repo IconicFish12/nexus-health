@@ -1,0 +1,52 @@
+apiVersion: skaffold/v4beta3
+kind: Config
+metadata:
+  name: nexus-health
+build:
+  artifacts:
+  # Example artifact: auth-service
+  - image: nexus-health/auth-service
+    context: apps/auth-service
+    docker:
+      dockerfile: Dockerfile
+  # You can uncomment and add other service artifacts as you write their Dockerfiles:
+  # - image: nexus-health/api-gateway
+  #   context: apps/nexus-health
+  #   docker:
+  #     dockerfile: Dockerfile
+  # - image: nexus-health/appointment-service
+  #   context: apps/appointment-service
+  #   docker:
+  #     dockerfile: Dockerfile
+  # - image: nexus-health/billing-service
+  #   context: apps/billing-service
+  #   docker:
+  #     dockerfile: Dockerfile
+  # - image: nexus-health/hr-service
+  #   context: apps/hr-service
+  #   docker:
+  #     dockerfile: Dockerfile
+  # - image: nexus-health/inventory-service
+  #   context: apps/inventory-service
+  #   docker:
+  #     dockerfile: Dockerfile
+  # - image: nexus-health/notification-service
+  #   context: apps/notification-service
+  #   docker:
+  #     dockerfile: Dockerfile
+  # - image: nexus-health/patient-emr-service
+  #   context: apps/patient-emr-service
+  #   docker:
+  #     dockerfile: Dockerfile
+  # - image: nexus-health/pharmacy-service
+  #   context: apps/pharmacy-service
+  #   docker:
+  #     dockerfile: Dockerfile
+  # - image: nexus-health/ward-service
+  #   context: apps/ward-service
+  #   docker:
+  #     dockerfile: Dockerfile
+manifests:
+  kustomize:
+    paths:
+    - k8s/overlays/staging

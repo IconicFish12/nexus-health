@@ -1,0 +1,30 @@
+# ---------------------------------------------------------------------------
+# HORIZONTAL POD AUTOSCALER (HPA) TEMPLATE FOR NEXUS HEALTH MICROSERVICES
+# Automatically scales pod count based on resource utilization.
+# ---------------------------------------------------------------------------
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: auth-service-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: auth-service
+  minReplicas: 1 # Minimum pods running under normal conditions
+  maxReplicas: 5 # Maximum pods during peak load
+  metrics:
+  # Metrics type 1: CPU Utilization
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80 # Scales up if average CPU usage exceeds 80%
+  # Metrics type 2: Memory Utilization
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 85 # Scales up if average memory usage exceeds 85%

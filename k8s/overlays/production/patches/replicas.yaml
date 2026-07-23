@@ -1,0 +1,17 @@
+# ---------------------------------------------------------------------------
+# PRODUCTION REPLICAS PATCH
+# Ensures high availability (HA) by running multiple pod instances.
+# ---------------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+spec:
+  replicas: 3 # Scale to 3 replicas for redundancy and load balancing
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: caddy-gateway
+spec:
+  replicas: 2 # Scale to 2 replicas for routing redundancy

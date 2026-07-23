@@ -1,0 +1,23 @@
+# ---------------------------------------------------------------------------
+# SERVICE TEMPLATE FOR NEXUS HEALTH MICROSERVICES
+# Exposes deployment pods internally within the cluster.
+# ---------------------------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  labels:
+    app.kubernetes.io/name: auth-service
+    app.kubernetes.io/part-of: nexus-health
+spec:
+  ports:
+  - name: http
+    port: 3000       # Port exposed by the Service to other components
+    targetPort: http # Points to the deployment containerPort 'http' (3000)
+    protocol: TCP
+  - name: grpc
+    port: 50051
+    targetPort: grpc # Points to the deployment containerPort 'grpc' (50051)
+    protocol: TCP
+  selector:
+    app: auth-service # Connects to Pods labeled with app=auth-service

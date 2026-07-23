@@ -1,0 +1,14 @@
+# ---------------------------------------------------------------------------
+# POD DISRUPTION BUDGET (PDB) TEMPLATE FOR NEXUS HEALTH MICROSERVICES
+# Guarantees service availability during planned cluster maintenance.
+# ---------------------------------------------------------------------------
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: auth-service-pdb
+spec:
+  # Guarantees at least 1 pod is always available when draining nodes
+  minAvailable: 1 
+  selector:
+    matchLabels:
+      app: auth-service

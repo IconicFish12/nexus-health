@@ -1,0 +1,87 @@
+# ---------------------------------------------------------------------------
+# DEPLOYMENT TEMPLATE FOR NEXUS HEALTH MICROSERVICES
+# Use this file as a reference to create deployments for other services.
+# Change occurrences of "auth-service" to your service's name.
+# ---------------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service # Name of your application deployment
+  labels:
+    # Recommended standard Kubernetes labels
+    app.kubernetes.io/name: auth-service
+    app.kubernetes.io/part-of: nexus-health
+    app.kubernetes.io/component: microservice
+spec:
+  # Initial replica count. Overruled in staging/production overlays.
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: auth-service # Must match template.metadata.labels
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      # --- Pod Security Settings (Production Best Practice) ---
+      securityContext:
+        runAsNonRoot: true # Prevent containers running as root (UID 0)
+        runAsUser: 10001   # Run process as a non-privileged system user
+        runAsGroup: 10001
+        fsGroup: 10001
+      
+      containers:
+      - name: auth-service
+        # Image will be dynamically replaced by Skaffold/Kustomize during build
+        image: nexus-health/auth-service:latest
+        imagePullPolicy: IfNotPresent
+        
+        # --- Container Security Settings (Least Privilege) ---
+        securityContext:
+          allowPrivilegeEscalation: false # Prevent processes from gaining more privileges than parent
+          readOnlyRootFilesystem: true    # Prevent writing files directly to container image layers
+          capabilities:
+            drop:
+            - ALL # Drop all Linux capabilities
+            
+        ports:
+        - containerPort: 3000
+          name: http # Expose standard HTTP NestJS port
+        - containerPort: 50051
+          name: grpc # Expose gRPC port for internal microservice communication
+          
+        # --- Environment Variables ---
+        # Instead of injecting values directly, we pull them from Kustomize-generated ConfigMaps/Secrets
+        envFrom:
+        - configMapRef:
+            name: auth-service-config
+            
+        # --- Resource Allocation (Guarantees QoS & Prevents Out-Of-Memory kills) ---
+        resources:
+          requests:
+            cpu: 100m     # Guaranteed minimum CPU (0.1 CPU core)
+            memory: 128Mi # Guaranteed minimum memory
+          limits:
+            cpu: 500m     # Hard ceiling for CPU usage
+            memory: 512Mi # Hard ceiling for memory (container restarts if it exceeds this)
+            
+        # --- Health Checks / Probes ---
+        # NestJS Terminus coordinates readiness & liveness signals.
+        # Tells Kubernetes when to route traffic to the pod.
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 3
+        # Tells Kubernetes when the container is unhealthy and must be restarted.
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 3

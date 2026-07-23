@@ -1,0 +1,17 @@
+# ---------------------------------------------------------------------------
+# PRODUCTION ENVIRONMENT OVERLAY
+# Optimizes configuration for high availability, security, and load.
+# ---------------------------------------------------------------------------
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base
+- ingress.yaml # Exposes our Ingress rules externally
+
+namespace: nexus-health-production
+
+patches:
+- path: patches/replicas.yaml  # Scales pods to multiple replicas for HA
+- path: patches/resources.yaml # Allocates production-grade CPU/memory specs
+- path: patches/security.yaml  # Tightens container security contexts

@@ -1,0 +1,16 @@
+# ---------------------------------------------------------------------------
+# BASE APPLICATIONS KUSTOMIZATION
+# Lists all business microservices currently deployed in the base layer.
+# ---------------------------------------------------------------------------
+resources:
+- auth-service/
+# Add your other microservices here once you copy the templates, for example:
+# - api-gateway/
+# - appointment-service/
+# - billing-service/
+# - hr-service/
+# - inventory-service/
+# - notification-service/
+# - patient-emr-service/
+# - pharmacy-service/
+# - ward-service/

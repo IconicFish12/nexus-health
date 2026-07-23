@@ -1,0 +1,9 @@
+# ---------------------------------------------------------------------------
+# MAIN BASE KUSTOMIZATION
+# Compiles namespaces, global network policies, platform infra, and apps.
+# ---------------------------------------------------------------------------
+resources:
+- namespaces.yaml
+- network-policies/default-deny.yaml
+- infrastructure/
+- apps/

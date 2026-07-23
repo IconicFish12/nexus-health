@@ -1,0 +1,3 @@
+resources:
+- postgres-auth.yaml
+# Add other postgres-*.yaml files here as you create them

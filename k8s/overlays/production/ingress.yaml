@@ -1,0 +1,29 @@
+# ---------------------------------------------------------------------------
+# PRODUCTION INGRESS MANIFEST
+# Configures external load balancing, DNS, and TLS termination.
+# ---------------------------------------------------------------------------
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nexus-health-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod # Auto-certificates via Let's Encrypt
+    nginx.ingress.kubernetes.io/ssl-redirect: "true" # Enforce HTTPS redirection
+spec:
+  tls:
+  - hosts:
+    - api.nexushealth.com
+    secretName: nexus-health-tls
+  rules:
+  - host: api.nexushealth.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            # Proxies requests to Caddy, which handles internal microservice routing
+            name: caddy-gateway 
+            port:
+              number: 80

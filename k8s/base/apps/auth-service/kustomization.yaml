@@ -1,0 +1,24 @@
+# ---------------------------------------------------------------------------
+# KUSTOMIZATION FILE FOR AUTH SERVICE
+# Declares local resources and configuration generators.
+# ---------------------------------------------------------------------------
+resources:
+- deployment.yaml
+- service.yaml
+- networkpolicy.yaml
+- hpa.yaml
+- pdb.yaml
+
+# Best Practice: Using configMapGenerator to manage environment variables.
+# It hashes the ConfigMap name and triggers rolling updates of deployments when config changes.
+configMapGenerator:
+- name: auth-service-config
+  literals:
+  - PORT="3000"
+  - GRPC_PORT="50051"
+  - NODE_ENV="production"
+  - DB_HOST="postgres-auth"
+  - DB_PORT="5432"
+  - DB_NAME="auth_db"
+  - DB_USER="auth_user"
+  - DB_PASSWORD="auth_pass"

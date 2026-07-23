@@ -1,0 +1,20 @@
+# ---------------------------------------------------------------------------
+# PRODUCTION RESOURCES PATCH
+# Allocates enterprise resource parameters to ensure performance stability.
+# ---------------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+spec:
+  template:
+    spec:
+      containers:
+      - name: auth-service
+        resources:
+          requests:
+            cpu: 250m     # Reserve 1/4 CPU core per pod
+            memory: 256Mi # Reserve 256MB memory per pod
+          limits:
+            cpu: 1000m    # Allow bursting up to 1 full CPU core
+            memory: 512Mi # Hard ceiling of 512MB

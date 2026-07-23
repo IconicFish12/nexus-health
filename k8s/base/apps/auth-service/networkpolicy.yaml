@@ -1,0 +1,76 @@
+# ---------------------------------------------------------------------------
+# NETWORKPOLICY TEMPLATE FOR NEXUS HEALTH MICROSERVICES
+# Enforces least-privilege firewall rules inside the cluster.
+# ---------------------------------------------------------------------------
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: auth-service-netpol
+spec:
+  podSelector:
+    matchLabels:
+      app: auth-service # Policy targets auth-service pods
+  policyTypes:
+  - Ingress
+  - Egress
+  
+  # --- Traffic entering the microservice ---
+  ingress:
+  # Rule 1: Allow ingress from Caddy API Gateway
+  - from:
+    - podSelector:
+        matchLabels:
+          app: caddy-gateway
+    ports:
+    - protocol: TCP
+      port: 3000 # HTTP
+  # Rule 2: Allow ingress from internal microservices (e.g. billing-service calling auth)
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/part-of: nexus-health
+    ports:
+    - protocol: TCP
+      port: 3000  # HTTP
+    - protocol: TCP
+      port: 50051 # gRPC
+  # Rule 3: Allow Prometheus scraper
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus
+    ports:
+    - protocol: TCP
+      port: 3000
+
+  # --- Traffic leaving the microservice ---
+  egress:
+  # Rule 1: Allow egress to CoreDNS for name resolution (Required for resolving service names!)
+  - to:
+    - namespaceSelector: {} # Allow CoreDNS namespaces
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  # Rule 2: Allow egress to its dedicated PostgreSQL database
+  - to:
+    - podSelector:
+        matchLabels:
+          app: postgres-auth
+    ports:
+    - protocol: TCP
+      port: 5432
+  # Rule 3: Allow egress to the Otel Collector for tracing and metrics collection
+  - to:
+    - podSelector:
+        matchLabels:
+          app: otel-collector
+    ports:
+    - protocol: TCP
+      port: 4317 # OTLP gRPC
+    - protocol: TCP
+      port: 4318 # OTLP HTTP

@@ -1,0 +1,24 @@
+# ---------------------------------------------------------------------------
+# STAGING REPLICAS PATCH
+# Restricts all deployments to 1 replica to save cluster resources/costs.
+# ---------------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+spec:
+  replicas: 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: caddy-gateway
+spec:
+  replicas: 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-auth
+spec:
+  replicas: 1
