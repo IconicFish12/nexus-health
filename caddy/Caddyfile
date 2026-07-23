@@ -1,3 +1,111 @@
+# Global configuration block
 {
+    log {
+        format json
+        output stdout
+    }
+}
 
+# Nexus Health API reverse proxy and entrypoint
+http://localhost:80, :80 {
+    # Compress responses
+    encode gzip zstd
+
+    # Production-ready Security Headers
+    header {
+        # Disallow embedding in iframes to prevent clickjacking
+        X-Frame-Options "DENY"
+        # Enable XSS protection
+        X-XSS-Protection "1; mode=block"
+        # Prevent MIME type sniffing
+        X-Content-Type-Options "nosniff"
+        # Strict referrer policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Permissions policy (restricting browser features)
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    }
+
+    # Route matching for all microservices.
+    # Note: If your backends expect routes to start from the root (e.g. '/' instead of '/api/auth'),
+    # you can change 'handle' to 'handle_path' to automatically strip the matched prefix.
+    
+    # Auth Service
+    handle /api/auth* {
+        reverse_proxy auth-service:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_ip}
+        }
+    }
+
+    # Appointment Service
+    handle /api/appointments* {
+        reverse_proxy appointment-service:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_ip}
+        }
+    }
+
+    # Billing Service
+    handle /api/billing* {
+        reverse_proxy billing-service:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_ip}
+        }
+    }
+
+    # HR Service
+    handle /api/hr* {
+        reverse_proxy hr-service:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_ip}
+        }
+    }
+
+    # Inventory Service
+    handle /api/inventory* {
+        reverse_proxy inventory-service:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_ip}
+        }
+    }
+
+    # Notification Service
+    handle /api/notifications* {
+        reverse_proxy notification-service:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_ip}
+        }
+    }
+
+    # Patient EMR Service
+    handle /api/patient-emr* {
+        reverse_proxy patient-emr-service:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_ip}
+        }
+    }
+
+    # Pharmacy Service
+    handle /api/pharmacy* {
+        reverse_proxy pharmacy-service:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_ip}
+        }
+    }
+
+    # Ward Service
+    handle /api/ward* {
+        reverse_proxy ward-service:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_ip}
+        }
+    }
+
+    # Default fallback route to the API Gateway (nexus-health)
+    handle * {
+        reverse_proxy api-gateway:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_ip}
+        }
+    }
 }
