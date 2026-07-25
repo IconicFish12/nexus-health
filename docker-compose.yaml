@@ -1,0 +1,13 @@
+name: nexus-heatlhcare-system
+
+networks:
+  system_network:pro
+    driver: bridge
+
+volumes: 
+  psql_data:
+  caddy_data:
+  caddy_config:
+
+services:
+  #infrastructure

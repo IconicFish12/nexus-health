@@ -1,14 +1,14 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "apps/nexus-healthcare-system/src",
+  "sourceRoot": "apps/api-gateway/src",
   "compilerOptions": {
     "deleteOutDir": true,
     "webpack": true,
-    "tsConfigPath": "apps/nexus-healthcare-system/tsconfig.app.json"
+    "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
   },
   "monorepo": true,
-  "root": "apps/nexus-healthcare-system",
+  "root": "apps/api-gateway",
   "projects": {
     "api-gateway": {
       "type": "application",
@@ -71,15 +71,6 @@
       "sourceRoot": "apps/inventory-service/src",
       "compilerOptions": {
         "tsConfigPath": "apps/inventory-service/tsconfig.app.json"
-      }
-    },
-    "nexus-healthcare-system": {
-      "type": "application",
-      "root": "apps/nexus-healthcare-system",
-      "entryFile": "main",
-      "sourceRoot": "apps/nexus-healthcare-system/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/nexus-healthcare-system/tsconfig.app.json"
       }
     },
     "notification-service": {
