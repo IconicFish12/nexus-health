@@ -3,7 +3,6 @@ import { AppointmentServiceController } from './appointment-service.controller';
 import { AppointmentServiceService } from './appointment-service.service';
 
 @Module({
-  imports: [],
   controllers: [AppointmentServiceController],
   providers: [AppointmentServiceService],
 })
