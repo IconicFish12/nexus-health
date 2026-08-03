@@ -1,13 +1,161 @@
 name: nexus-heatlhcare-system
 
 networks:
-  system_network:pro
+  system_network:
     driver: bridge
 
-volumes: 
+volumes:
   psql_data:
   caddy_data:
   caddy_config:
+  nats_data:
+  redis_data:
+  prometheus_data:
+  loki_data:
+  tempo_data:
 
 services:
-  #infrastructure
+  # infrastructure
+  # 1. Main Config
+  caddy:
+    image: caddy:2.11-alpine
+    container_name: nexus-caddy
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - $PWD/conf:/etc/caddy
+      - $PWD/site:/srv
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - system_network
+
+  nats:
+    image: nats:2.14-alpine
+    container_name: messaging-system
+    command: ['-js', '-sd', '/data']
+    ports:
+      - '4222:4222'
+      - '8222:8222'
+    volumes:
+      - nats_data:/data
+    networks:
+      - system_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: nexus-redis
+    restart: always
+    ports:
+      - '6380:6379' # Host port 6380 -> Container port 6379
+    volumes:
+      - redis_data:/data
+    networks:
+      - system_network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  otel:
+    image: otel/opentelemetry-collector-contrib:nightly-amd64
+    container_name: nexus-otel-collector
+    restart: unless-stopped
+    command: ['--config=/etc/otelcol-contrib/config.yaml']
+    volumes:
+      - ./docker/monitoring/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro,z
+    ports:
+      - '4317:4317' # OTLP gRPC Receiver (NestJS Services)
+      - '4318:4318' # OTLP HTTP Receiver
+      - '8889:8889' # Prometheus Exporter Scrape Endpoint
+    networks:
+      - system_network
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: nexus-prom-node
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    expose:
+      - 9100
+    networks:
+      - system_network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: nexus-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/opt/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/opt/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    expose:
+      - 9090
+    networks:
+      - system_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: nexus-grafana
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - system_network
+
+  loki:
+    image: grafana/loki:latest
+    container_name: nexus-loki
+    restart: unless-stopped
+    command: ['-config.file=/etc/loki/local-config.yaml']
+    volumes:
+      - ./loki_config.yaml:/etc/loki/config.yml:ro
+    ports:
+      - '3100:3100' # HTTP port address
+      - '9096:9096' # gRPC port address
+    networks:
+      - system_network
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: nexus-tempo
+    restart: unless-stopped
+    command: ['-config.file=/etc/tempo/tempo.yaml']
+    volumes:
+      - ./tempo.yaml:/etc/tempo/tempo.yaml:ro
+      - tempo_data:/var/tempo
+    ports:
+      - '3200:3200' # Tempo HTTP
+    networks:
+      - system_network
+
+  alloy:
+    image: grafana/alloy:latest
+    container_name: nexus-alloy
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ['run', '/etc/alloy/config.alloy']
+    depends_on:
+      - loki
+    networks:
+      - system_network
+
+  # system services
