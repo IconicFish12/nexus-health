@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { BillingServiceModule } from './billing-service.module';
+import { BillingServiceModule } from './billing-service.module.ts';
 
 async function bootstrap() {
   const app = await NestFactory.create(BillingServiceModule);

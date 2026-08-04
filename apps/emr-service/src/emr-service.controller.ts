@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { EmrServiceService } from './emr-service.service';
+import { EmrServiceService } from './emr-service.service.ts';
 
 @Controller()
 export class EmrServiceController {

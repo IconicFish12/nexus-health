@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { InventoryServiceModule } from './../src/inventory-service.module';
+import request from 'supertest';
+import { InventoryServiceModule } from './../src/inventory-service.module.ts';
 
 describe('InventoryServiceController (e2e)', () => {
   let app: INestApplication;

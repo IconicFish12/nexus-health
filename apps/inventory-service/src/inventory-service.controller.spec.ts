@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { InventoryServiceController } from './inventory-service.controller';
-import { InventoryServiceService } from './inventory-service.service';
+import { InventoryServiceController } from './inventory-service.controller.ts';
+import { InventoryServiceService } from './inventory-service.service.ts';
 
 describe('InventoryServiceController', () => {
   let inventoryServiceController: InventoryServiceController;

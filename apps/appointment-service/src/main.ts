@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { AppointmentServiceModule } from './appointment-service.module';
+import { AppointmentServiceModule } from './appointment-service.module.ts';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppointmentServiceModule);
