@@ -5,7 +5,6 @@
   "author": "IconicFish12",
   "private": true,
   "license": "UNLICENSED",
-  "type": "module",
   "scripts": {
     "build": "nest build --builder swc",
     "format": "bunx prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
