@@ -1,0 +1,73 @@
+# Build Output
+/dist
+/build
+/.out
+
+# Node & Package Managers
+/node_modules
+apps/*/node_modules
+libs/*/node_modules
+bun.lockb
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Turborepo & Compilers
+.turbo
+.swc
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+apps/*/.env
+apps/*/.env.local
+apps/*/.env.production
+
+# Tests & Coverage
+/coverage
+/.nyc_output
+*.lcov
+
+# Operating System & IDEs
+.DS_Store
+Thumbs.db
+/.idea
+/.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.suo
+*.user
+*.userossc
+*.sln
+*.swp
+
+# Docker & Infrastructure Runtime Data
+caddy_data/
+caddy_config/
+postgres_data/
+redis_data/
+nats_data/
+prometheus_data/
+loki_data/
+tempo_data/
+conf/
+site/
+
+# Prisma Generated Client & DB Artifacts
+prisma/migrations/*.sql.bak
+*.db
+*.sqlite
+
+# Logs & Temp Files
+logs
+*.log
+.temp
+.tmp
+pids
+*.pid
+*.seed
+*.pid.lock

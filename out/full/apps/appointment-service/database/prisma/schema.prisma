@@ -1,0 +1,36 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+    provider               = "prisma-client"
+    output                 = "../generated/prisma"
+    runtime                = "bun"
+    moduleFormat           = "esm"
+    generatedFileExtension = "ts"
+    importFileExtension    = "ts"
+    binaryTargets          = ["native", "rhel-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+enum AppointmentStatus {
+    SCHEDULED
+    CHECKED_IN
+    COMPLETED
+    CANCELLED
+    NO_SHOW
+}
+
+model Appointment {
+    id          String            @id @default(uuid())
+    patientId   String
+    doctorId    String
+    scheduledAt DateTime
+    status      AppointmentStatus @default(SCHEDULED)
+    createdAt   DateTime          @default(now())
+    updatedAt   DateTime          @updatedAt
+}

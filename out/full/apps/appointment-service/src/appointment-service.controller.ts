@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppointmentServiceService } from './appointment-service.service';
+import { AppointmentServiceService } from './appointment-service.service.ts';
 
 @Controller()
 export class AppointmentServiceController {
