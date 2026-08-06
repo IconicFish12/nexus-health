@@ -7,8 +7,6 @@
     "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^10.0.1",
     "@nestjs/testing": "^11.1.28",
-    "@swc/cli": "^0.8.1",
-    "@swc/core": "^1.15.46",
     "@types/bun": "latest",
     "@types/express": "^5.0.6",
     "@types/node": "^26.1.1",
@@ -52,5 +50,13 @@
     "pg": "^8.22.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
+  },
+  "scripts": {
+    "build": "nest build --builder swc staff-service",
+    "start:dev": "nest start --watch --builder swc staff-service",
+    "start:debug": "nest start --debug --watch --builder swc staff-service",
+    "start:prod": "node dist/apps/staff-service/main.js",
+    "lint": "eslint \"src/**/*.ts\" --fix",
+    "test": "jest"
   }
 }

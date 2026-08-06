@@ -1,56 +1,73 @@
-# compiled output
+# Build Output
 /dist
-/node_modules
 /build
+/.out
 
-# Logs
-logs
-*.log
+# Node & Package Managers
+/node_modules
+apps/*/node_modules
+libs/*/node_modules
+bun.lockb
 npm-debug.log*
-pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-lerna-debug.log*
+pnpm-debug.log*
 
-# OS
-.DS_Store
+# Turborepo & Compilers
+.turbo
+.swc
 
-# Tests
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+apps/*/.env
+apps/*/.env.local
+apps/*/.env.production
+
+# Tests & Coverage
 /coverage
 /.nyc_output
+*.lcov
 
-# IDEs and editors
+# Operating System & IDEs
+.DS_Store
+Thumbs.db
 /.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# IDE - VSCode
-.vscode/*
+/.vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+*.suo
+*.user
+*.userossc
+*.sln
+*.swp
 
-# dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+# Docker & Infrastructure Runtime Data
+caddy_data/
+caddy_config/
+postgres_data/
+redis_data/
+nats_data/
+prometheus_data/
+loki_data/
+tempo_data/
+conf/
+site/
 
-# temp directory
+# Prisma Generated Client & DB Artifacts
+prisma/migrations/*.sql.bak
+*.db
+*.sqlite
+
+# Logs & Temp Files
+logs
+*.log
 .temp
 .tmp
-
-# Runtime data
 pids
 *.pid
 *.seed
 *.pid.lock
-
-# Diagnostic reports (https://nodejs.org/api/report.html)
-report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
