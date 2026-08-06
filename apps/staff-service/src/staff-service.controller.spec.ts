@@ -11,7 +11,9 @@ describe('StaffServiceController', () => {
       providers: [StaffServiceService],
     }).compile();
 
-    staffServiceController = app.get<StaffServiceController>(StaffServiceController);
+    staffServiceController = app.get<StaffServiceController>(
+      StaffServiceController,
+    );
   });
 
   describe('root', () => {
