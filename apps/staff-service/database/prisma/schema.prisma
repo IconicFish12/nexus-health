@@ -4,10 +4,38 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+    provider               = "prisma-client"
+    output                 = "../generated/prisma"
+    runtime                = "bun"
+    moduleFormat           = "esm"
+    generatedFileExtension = "ts"
+    importFileExtension    = "ts"
+    binaryTargets          = ["native", "rhel-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model Staff {
+  id            String     @id @default(uuid())
+  name          String
+  email         String     @unique
+  role          String     // mirrors Role enum in auth DB
+  specialty     String?
+  department    String
+  contactNumber String?
+  isActive      Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  shifts        Shift[]
+}
+
+model Shift {
+  id        String   @id @default(uuid())
+  staff     Staff    @relation(fields: [staffId], references: [id])
+  staffId   String
+  dayOfWeek Int      // 0 = Monday, 6 = Sunday
+  startTime String   // "08:00"
+  endTime   String   // "16:00"
 }
