@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { StaffServiceController } from './staff-service.controller.ts';
-import { StaffServiceService } from './staff-service.service.ts';
+import { StaffServiceController } from './staff-service.controller';
+import { StaffServiceService } from './staff-service.service';
 
 describe('StaffServiceController', () => {
   let staffServiceController: StaffServiceController;
@@ -11,7 +11,9 @@ describe('StaffServiceController', () => {
       providers: [StaffServiceService],
     }).compile();
 
-    staffServiceController = app.get<StaffServiceController>(StaffServiceController);
+    staffServiceController = app.get<StaffServiceController>(
+      StaffServiceController,
+    );
   });
 
   describe('root', () => {
