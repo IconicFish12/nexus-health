@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { WardServiceService } from './ward-service.service';
+import { WardServiceService } from './ward-service.service.ts';
 
 @Controller()
 export class WardServiceController {

@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { PharmacyServiceModule } from './pharmacy-service.module';
+import { PharmacyServiceModule } from './pharmacy-service.module.ts';
 
 async function bootstrap() {
   const app = await NestFactory.create(PharmacyServiceModule);

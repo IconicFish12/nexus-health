@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { EmrServiceModule } from './emr-service.module';
+import { EmrServiceModule } from './emr-service.module.ts';
 
 async function bootstrap() {
   const app = await NestFactory.create(EmrServiceModule);

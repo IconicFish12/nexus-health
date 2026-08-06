@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PharmacyDatabaseService } from './pharmacy-database.service';
+import { PharmacyDatabaseService } from './pharmacy-database.service.ts';
 
 describe('PharmacyDatabaseService', () => {
   let service: PharmacyDatabaseService;

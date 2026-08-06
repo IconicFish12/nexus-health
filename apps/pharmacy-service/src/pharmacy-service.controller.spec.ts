@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PharmacyServiceController } from './pharmacy-service.controller';
-import { PharmacyServiceService } from './pharmacy-service.service';
+import { PharmacyServiceController } from './pharmacy-service.controller.ts';
+import { PharmacyServiceService } from './pharmacy-service.service.ts';
 
 describe('PharmacyServiceController', () => {
   let pharmacyServiceController: PharmacyServiceController;

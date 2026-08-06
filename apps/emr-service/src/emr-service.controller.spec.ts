@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EmrServiceController } from './emr-service.controller';
-import { EmrServiceService } from './emr-service.service';
+import { EmrServiceController } from './emr-service.controller.ts';
+import { EmrServiceService } from './emr-service.service.ts';
 
 describe('EmrServiceController', () => {
   let emrServiceController: EmrServiceController;

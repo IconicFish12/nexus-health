@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { StaffServiceModule } from './../src/staff-service.module';
+import request from 'supertest';
+import { StaffServiceModule } from './../src/staff-service.module.ts';
 
 describe('StaffServiceController (e2e)', () => {
   let app: INestApplication;
