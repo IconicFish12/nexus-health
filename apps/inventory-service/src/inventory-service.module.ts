@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { InventoryServiceController } from './inventory-service.controller.ts';
-import { InventoryServiceService } from './inventory-service.service.ts';
+import { InventoryServiceController } from './inventory-service.controller';
+import { InventoryServiceService } from './inventory-service.service';
 
 @Module({
   imports: [],
