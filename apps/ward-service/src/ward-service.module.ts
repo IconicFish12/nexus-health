@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { WardServiceController } from './ward-service.controller';
-import { WardServiceService } from './ward-service.service';
+import { WardServiceController } from './ward-service.controller.ts';
+import { WardServiceService } from './ward-service.service.ts';
 
 @Module({
   imports: [],

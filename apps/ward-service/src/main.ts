@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { WardServiceModule } from './ward-service.module';
+import { WardServiceModule } from './ward-service.module.ts';
 
 async function bootstrap() {
   const app = await NestFactory.create(WardServiceModule);

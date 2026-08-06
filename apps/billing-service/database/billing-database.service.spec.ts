@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BillingDatabaseService } from './billing-database.service';
+import { BillingDatabaseService } from './billing-database.service.ts';
 
 describe('BillingDatabaseService', () => {
   let service: BillingDatabaseService;

@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EmrDatabaseService } from './emr-database.service';
+import { EmrDatabaseService } from './emr-database.service.ts';
 
 describe('EmrDatabaseService', () => {
   let service: EmrDatabaseService;

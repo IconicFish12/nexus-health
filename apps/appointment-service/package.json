@@ -1,26 +1,23 @@
 {
   "name": "appointment-service",
   "module": "index.ts",
-  "type": "module",
   "private": true,
   "scripts": {
-    "prisma:migrate": "bunx prisma migrate dev",
     "prisma:generate": "bunx prisma generate",
-    "prisma:studio": "bunx prisma studio",
+    "prisma:migrate": "bunx prisma migrate dev",
     "prisma:migrate:reset": "bunx prisma migrate reset",
-    "prisma:seed": "bunx prisma db seed",
-    "build": "bunx nest build",
-    ""
+    "prisma:studio": "bunx prisma studio",
+    "build": "nest build --builder swc appointment-service",
+    "start:dev": "nest start --watch --builder swc appointment-service",
+    "start:debug": "nest start --debug --watch --builder swc appointment-service",
+    "start:prod": "node dist/apps/appointment-service/main.js",
+    "lint": "eslint \"src/**/*.ts\" --fix",
+    "test": "jest"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^10.0.1",
     "@nestjs/testing": "^11.1.28",
-    "@swc/cli": "^0.8.1",
-    "@swc/core": "^1.15.46",
-    "@types/express": "^5.0.6",
-    "@types/node": "^26.1.1",
-    "@types/pg": "^8.20.0",
     "@types/supertest": "^7.2.1",
     "eslint": "^10.8.0",
     "jest": "^30.4.2",
@@ -66,5 +63,11 @@
     "pg": "^8.22.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "bun",
+      "version": "1.3.14"
+    }
   }
 }
