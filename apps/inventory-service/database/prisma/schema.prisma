@@ -4,10 +4,152 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+    provider               = "prisma-client"
+    output                 = "../generated/prisma"
+    runtime                = "bun"
+    moduleFormat           = "esm"
+    generatedFileExtension = "ts"
+    importFileExtension    = "ts"
+    binaryTargets          = ["native", "rhel-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "postgresql"
+    provider = "postgresql"
+}
+
+enum SupplyCategory {
+    BLOOD_BANK
+    LAB_REAGENT
+    SURGICAL
+    PPE
+    MEDICAL_GAS
+    LINEN
+    CONSUMABLE
+    EQUIPMENT
+}
+
+enum BloodType {
+    A
+    B
+    AB
+    O
+}
+
+enum RhFactor {
+    POSITIVE
+    NEGATIVE
+}
+
+enum BloodUnitStatus {
+    AVAILABLE
+    RESERVED
+    TRANSFUSED
+    DISCARDED
+    EXPIRED
+}
+
+enum POStatus {
+    DRAFT
+    SUBMITTED
+    PARTIALLY_RECEIVED
+    RECEIVED
+    CANCELLED
+}
+
+model SupplyItem {
+    id             String              @id @default(uuid())
+    name           String
+    sku            String              @unique
+    category       SupplyCategory
+    unitOfMeasure  String // "unit", "box", "cylinder", "ml", "kg"
+    quantityOnHand Int                 @default(0)
+    reorderLevel   Int
+    unitCost       Decimal             @db.Decimal(10, 2)
+    supplierRef    String?
+    batchCode      String?
+    expirationDate DateTime? // null for non-expiring items like equipment
+    updatedAt      DateTime            @updatedAt
+    consumptions   StockConsumption[]
+    purchaseItems  PurchaseOrderItem[]
+
+    @@index([category, expirationDate]) // index for expiry cron job
+}
+
+model BloodUnit {
+    id             String          @id @default(uuid())
+    bloodType      BloodType
+    rhFactor       RhFactor
+    donationDate   DateTime
+    donorId        String?
+    expirationDate DateTime // whole blood: 42 days, platelets: 5 days
+    status         BloodUnitStatus @default(AVAILABLE)
+    reservedFor    String? // patient ID when RESERVED
+    admissionId    String? // admission ID when TRANSFUSED
+    transfusedAt   DateTime?
+    transfusedBy   String? // nurse staff ID ref
+    createdAt      DateTime        @default(now())
+    updatedAt      DateTime        @updatedAt
+
+    @@index([bloodType, rhFactor, status]) // index for blood matching queries
+    @@index([expirationDate, status]) // index for expiry scanner
+}
+
+model Supplier {
+    id           String          @id @default(uuid())
+    name         String
+    contactEmail String
+    contactPhone String?
+    address      String?
+    isActive     Boolean         @default(true)
+    createdAt    DateTime        @default(now())
+    orders       PurchaseOrder[]
+}
+
+model PurchaseOrder {
+    id          String              @id @default(uuid())
+    supplier    Supplier            @relation(fields: [supplierId], references: [id])
+    supplierId  String
+    status      POStatus            @default(DRAFT)
+    totalCost   Decimal             @default(0) @db.Decimal(12, 2)
+    notes       String?
+    submittedAt DateTime?
+    receivedAt  DateTime?
+    createdAt   DateTime            @default(now())
+    updatedAt   DateTime            @updatedAt
+    items       PurchaseOrderItem[]
+}
+
+model PurchaseOrderItem {
+    id             String        @id @default(uuid())
+    order          PurchaseOrder @relation(fields: [orderId], references: [id])
+    orderId        String
+    item           SupplyItem    @relation(fields: [itemId], references: [id])
+    itemId         String
+    qtyOrdered     Int
+    qtyReceived    Int           @default(0)
+    unitCost       Decimal       @db.Decimal(10, 2)
+    batchCode      String?
+    expirationDate DateTime?
+}
+
+model StockConsumption {
+    id          String     @id @default(uuid())
+    item        SupplyItem @relation(fields: [itemId], references: [id])
+    itemId      String
+    qtyConsumed Int
+    consumedBy  String // staff ID ref
+    department  String
+    patientId   String? // linked to patient if patient-specific consumption
+    reason      String?
+    consumedAt  DateTime   @default(now())
+}
+
+model OutboxEvent {
+    id        String   @id @default(uuid())
+    eventType String
+    payload   Json
+    published Boolean  @default(false)
+    createdAt DateTime @default(now())
+
+    @@index([published, createdAt])
 }
