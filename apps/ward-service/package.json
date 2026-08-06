@@ -1,8 +1,6 @@
 {
   "name": "ward-service",
   "module": "index.ts",
-  "type": "module",
-  "private": true,
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^10.0.1",
@@ -55,6 +53,10 @@
     "rxjs": "^7.8.2"
   },
   "scripts": {
+    "prisma:generate": "bunx prisma generate",
+    "prisma:migrate": "bunx prisma migrate dev",
+    "prisma:migrate:reset": "bunx prisma migrate reset",
+    "prisma:studio": "bunx prisma studio",
     "build": "nest build --builder swc ward-service",
     "start:dev": "nest start --watch --builder swc ward-service",
     "start:debug": "nest start --debug --watch --builder swc ward-service",

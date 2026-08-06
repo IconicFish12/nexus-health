@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { InventoryDatabaseService } from './inventory-database.service.ts';
+import { InventoryDatabaseService } from './inventory-database.service';
 
 @Module({
-  providers: [InventoryDatabaseService]
+  providers: [InventoryDatabaseService],
 })
 export class InventoryDatabaseModule {}

@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { StaffServiceService } from './staff-service.service.ts';
+import { StaffServiceService } from './staff-service.service';
 
 @Controller()
 export class StaffServiceController {

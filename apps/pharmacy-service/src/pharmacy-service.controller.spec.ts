@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PharmacyServiceController } from './pharmacy-service.controller.ts';
-import { PharmacyServiceService } from './pharmacy-service.service.ts';
+import { PharmacyServiceController } from './pharmacy-service.controller';
+import { PharmacyServiceService } from './pharmacy-service.service';
 
 describe('PharmacyServiceController', () => {
   let pharmacyServiceController: PharmacyServiceController;
@@ -11,7 +11,9 @@ describe('PharmacyServiceController', () => {
       providers: [PharmacyServiceService],
     }).compile();
 
-    pharmacyServiceController = app.get<PharmacyServiceController>(PharmacyServiceController);
+    pharmacyServiceController = app.get<PharmacyServiceController>(
+      PharmacyServiceController,
+    );
   });
 
   describe('root', () => {

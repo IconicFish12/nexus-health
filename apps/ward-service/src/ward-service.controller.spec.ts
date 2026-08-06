@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { WardServiceController } from './ward-service.controller.ts';
-import { WardServiceService } from './ward-service.service.ts';
+import { WardServiceController } from './ward-service.controller';
+import { WardServiceService } from './ward-service.service';
 
 describe('WardServiceController', () => {
   let wardServiceController: WardServiceController;
@@ -11,7 +11,9 @@ describe('WardServiceController', () => {
       providers: [WardServiceService],
     }).compile();
 
-    wardServiceController = app.get<WardServiceController>(WardServiceController);
+    wardServiceController = app.get<WardServiceController>(
+      WardServiceController,
+    );
   });
 
   describe('root', () => {
