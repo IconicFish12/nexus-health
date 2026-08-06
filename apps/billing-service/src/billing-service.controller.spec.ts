@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BillingServiceController } from './billing-service.controller.ts';
-import { BillingServiceService } from './billing-service.service.ts';
+import { BillingServiceController } from './billing-service.controller';
+import { BillingServiceService } from './billing-service.service';
 
 describe('BillingServiceController', () => {
   let billingServiceController: BillingServiceController;
@@ -11,7 +11,9 @@ describe('BillingServiceController', () => {
       providers: [BillingServiceService],
     }).compile();
 
-    billingServiceController = app.get<BillingServiceController>(BillingServiceController);
+    billingServiceController = app.get<BillingServiceController>(
+      BillingServiceController,
+    );
   });
 
   describe('root', () => {
