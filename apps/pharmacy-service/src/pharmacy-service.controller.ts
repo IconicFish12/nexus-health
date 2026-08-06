@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { PharmacyServiceService } from './pharmacy-service.service';
+import { PharmacyServiceService } from './pharmacy-service.service.ts';
 
 @Controller()
 export class PharmacyServiceController {

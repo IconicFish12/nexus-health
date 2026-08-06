@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { PharmacyServiceController } from './pharmacy-service.controller';
-import { PharmacyServiceService } from './pharmacy-service.service';
+import { PharmacyServiceController } from './pharmacy-service.controller.ts';
+import { PharmacyServiceService } from './pharmacy-service.service.ts';
 
 @Module({
   imports: [],

@@ -4,10 +4,48 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+    provider               = "prisma-client"
+    output                 = "../generated/prisma"
+    runtime                = "bun"
+    moduleFormat           = "esm"
+    generatedFileExtension = "ts"
+    importFileExtension    = "ts"
+    binaryTargets          = ["native", "rhel-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "postgresql"
+    provider = "postgresql"
+}
+
+enum Role {
+    ADMIN
+    DOCTOR
+    NURSE
+    PHARMACIST
+    INVENTORY_MANAGER // manages hospital supplies, PPE, surgical stock, medical gases
+    LAB_TECHNICIAN // manages blood bank and lab reagent stock
+    RECEPTIONIST
+    FINANCE_CLERK
+}
+
+model UserCredential {
+    id            String         @id @default(uuid())
+    staffId       String         @unique // Foreign reference — ID lives in staff-hr DB
+    email         String         @unique
+    passwordHash  String
+    role          Role
+    isActive      Boolean        @default(true)
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+    refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+    id           String         @id @default(uuid())
+    token        String         @unique
+    credential   UserCredential @relation(fields: [credentialId], references: [id])
+    credentialId String
+    expiresAt    DateTime
+    isRevoked    Boolean        @default(false)
+    createdAt    DateTime       @default(now())
 }

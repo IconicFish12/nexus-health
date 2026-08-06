@@ -4,10 +4,52 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+    provider               = "prisma-client"
+    output                 = "../generated/prisma"
+    runtime                = "bun"
+    moduleFormat           = "esm"
+    generatedFileExtension = "ts"
+    importFileExtension    = "ts"
+    binaryTargets          = ["native", "rhel-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "postgresql"
+    provider = "postgresql"
+}
+
+model Patient {
+    id                String      @id @default(uuid())
+    firstName         String
+    lastName          String
+    dob               DateTime
+    contactNumber     String
+    insuranceProvider String?
+    insurancePolicyNo String?
+    createdAt         DateTime    @default(now())
+    updatedAt         DateTime    @updatedAt
+    records           EmrRecord[]
+}
+
+model EmrRecord {
+    id             String   @id @default(uuid())
+    patient        Patient  @relation(fields: [patientId], references: [id])
+    patientId      String
+    doctorId       String // reference only — doctor lives in staff-hr DB
+    diagnosisCode  String // ICD-10
+    symptomsJson   Json
+    vitalsJson     Json
+    treatmentNotes String // AES-256-GCM encrypted at application layer
+    createdAt      DateTime @default(now())
+
+    @@index([diagnosisCode, createdAt]) // index for outbreak scanner query
+}
+
+model OutboxEvent {
+    id        String   @id @default(uuid())
+    eventType String
+    payload   Json
+    published Boolean  @default(false)
+    createdAt DateTime @default(now())
+
+    @@index([published, createdAt])
 }

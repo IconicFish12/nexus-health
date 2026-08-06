@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { InventoryDatabaseService } from './inventory-database.service';
+import { InventoryDatabaseService } from './inventory-database.service.ts';
 
 @Module({
   providers: [InventoryDatabaseService]
