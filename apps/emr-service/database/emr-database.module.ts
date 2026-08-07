@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { EmrDatabaseService } from './emr-database.service.ts';
+import { EmrDatabaseService } from './emr-database.service';
 
 @Module({
-  providers: [EmrDatabaseService]
+  providers: [EmrDatabaseService],
+  exports: [EmrDatabaseService],
 })
 export class EmrDatabaseModule {}

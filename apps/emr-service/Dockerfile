@@ -8,12 +8,10 @@ RUN bunx turbo prune emr-service --docker
 FROM base AS builder 
 WORKDIR /app
 
-# First install dependencies with lockfile for layer caching
 COPY --from=pruner /app/out/json .
 COPY --from=pruner /app/out/bun.lock* ./
 RUN bun install --frozen-lockfile
 
-# Copy source code and re-link workspace packages
 COPY --from=pruner /app/out/full .
 COPY turbo.json turbo.json
 RUN bun install
@@ -31,6 +29,6 @@ COPY --chown=bun:bun --from=builder /app/apps/emr-service/dist ./dist
 COPY --chown=bun:bun --from=builder /app/apps/emr-service/package.json ./package.json
 
 USER bun 
-EXPOSE 5002
+EXPOSE 3004
 
 CMD ["bun", "dist/main.js"]

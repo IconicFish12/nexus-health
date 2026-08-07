@@ -1,7 +1,6 @@
 {
   "name": "api-gateway",
   "module": "index.ts",
-  "type": "module",
   "private": true,
   "devDependencies": {
     "@compodoc/compodoc": "^2.0.0",

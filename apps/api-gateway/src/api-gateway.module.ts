@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ApiGatewayController } from './api-gateway.controller.ts';
-import { ApiGatewayService } from './api-gateway.service.ts';
+import { ApiGatewayController } from './api-gateway.controller';
+import { ApiGatewayService } from './api-gateway.service';
 
 @Module({
   imports: [],
