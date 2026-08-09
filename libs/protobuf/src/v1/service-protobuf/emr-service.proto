@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package nexus.emr.v1;
+
+import "google/protobuf/timestamp.proto";
+import "v1/main.proto";
+
+option go_package = "nexus/emr/v1;emrv1";
+
+message Patient {
+  string id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  google.protobuf.Timestamp dob = 4;
+  string contact_number = 5;
+  optional string insurance_provider = 6;
+  optional string insurance_policy_no = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message EmrRecord {
+  string id = 1;
+  string patient_id = 2;
+  string doctor_id = 3;
+  string diagnosis_code = 4; // ICD-10
+  string symptoms_json = 5;
+  string vitals_json = 6;
+  string treatment_notes = 7;
+  google.protobuf.Timestamp created_at = 8;
+}
+
+service EmrService {
+  rpc CreatePatient (CreatePatientRequest) returns (CreatePatientResponse);
+  rpc GetPatient (GetPatientRequest) returns (GetPatientResponse);
+  rpc ListPatients (ListPatientsRequest) returns (ListPatientsResponse);
+  rpc CreateEmrRecord (CreateEmrRecordRequest) returns (CreateEmrRecordResponse);
+  rpc GetEmrRecord (GetEmrRecordRequest) returns (GetEmrRecordResponse);
+  rpc ListEmrRecordsByPatient (ListEmrRecordsByPatientRequest) returns (ListEmrRecordsByPatientResponse);
+}
+
+message CreatePatientRequest {
+  string first_name = 1;
+  string last_name = 2;
+  google.protobuf.Timestamp dob = 3;
+  string contact_number = 4;
+  optional string insurance_provider = 5;
+  optional string insurance_policy_no = 6;
+}
+
+message CreatePatientResponse {
+  Patient patient = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message GetPatientRequest {
+  string id = 1;
+}
+
+message GetPatientResponse {
+  Patient patient = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message ListPatientsRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  optional string search_query = 3;
+}
+
+message ListPatientsResponse {
+  repeated Patient patients = 1;
+  nexus.main.v1.PaginationMeta pagination = 2;
+  nexus.main.v1.Error error = 3;
+}
+
+message CreateEmrRecordRequest {
+  string patient_id = 1;
+  string doctor_id = 2;
+  string diagnosis_code = 3;
+  string symptoms_json = 4;
+  string vitals_json = 5;
+  string treatment_notes = 6;
+}
+
+message CreateEmrRecordResponse {
+  EmrRecord record = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message GetEmrRecordRequest {
+  string id = 1;
+}
+
+message GetEmrRecordResponse {
+  EmrRecord record = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message ListEmrRecordsByPatientRequest {
+  string patient_id = 1;
+  int32 page = 2;
+  int32 limit = 3;
+}
+
+message ListEmrRecordsByPatientResponse {
+  repeated EmrRecord records = 1;
+  nexus.main.v1.PaginationMeta pagination = 2;
+  nexus.main.v1.Error error = 3;
+}

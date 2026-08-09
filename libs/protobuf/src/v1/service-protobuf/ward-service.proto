@@ -1,0 +1,140 @@
+syntax = "proto3";
+
+package nexus.ward.v1;
+
+import "google/protobuf/timestamp.proto";
+import "v1/main.proto";
+
+option go_package = "nexus/ward/v1;wardv1";
+
+enum WardType {
+  WARD_TYPE_UNSPECIFIED = 0;
+  WARD_TYPE_GENERAL     = 1;
+  WARD_TYPE_ICU         = 2;
+  WARD_TYPE_PEDIATRIC   = 3;
+  WARD_TYPE_MATERNITY   = 4;
+}
+
+enum BedStatus {
+  BED_STATUS_UNSPECIFIED = 0;
+  BED_STATUS_AVAILABLE   = 1;
+  BED_STATUS_OCCUPIED    = 2;
+  BED_STATUS_MAINTENANCE = 3;
+}
+
+message Bed {
+  string id = 1;
+  string ward_id = 2;
+  string bed_number = 3;
+  BedStatus status = 4;
+}
+
+message Ward {
+  string id = 1;
+  string name = 2;
+  WardType type = 3;
+  repeated Bed beds = 4;
+}
+
+message Admission {
+  string id = 1;
+  string bed_id = 2;
+  string patient_id = 3;
+  google.protobuf.Timestamp admitted_at = 4;
+  optional google.protobuf.Timestamp discharged_at = 5;
+  optional string discharged_by = 6;
+  optional Bed bed = 7;
+}
+
+service WardService {
+  rpc CreateWard (CreateWardRequest) returns (CreateWardResponse);
+  rpc GetWard (GetWardRequest) returns (GetWardResponse);
+  rpc ListWards (ListWardsRequest) returns (ListWardsResponse);
+  
+  rpc AddBed (AddBedRequest) returns (AddBedResponse);
+  rpc UpdateBedStatus (UpdateBedStatusRequest) returns (UpdateBedStatusResponse);
+  
+  rpc AdmitPatient (AdmitPatientRequest) returns (AdmitPatientResponse);
+  rpc DischargePatient (DischargePatientRequest) returns (DischargePatientResponse);
+  rpc GetAdmission (GetAdmissionRequest) returns (GetAdmissionResponse);
+}
+
+message CreateWardRequest {
+  string name = 1;
+  WardType type = 2;
+}
+
+message CreateWardResponse {
+  Ward ward = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message GetWardRequest {
+  string id = 1;
+}
+
+message GetWardResponse {
+  Ward ward = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message ListWardsRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  optional WardType type = 3;
+}
+
+message ListWardsResponse {
+  repeated Ward wards = 1;
+  nexus.main.v1.PaginationMeta pagination = 2;
+  nexus.main.v1.Error error = 3;
+}
+
+message AddBedRequest {
+  string ward_id = 1;
+  string bed_number = 2;
+}
+
+message AddBedResponse {
+  Bed bed = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message UpdateBedStatusRequest {
+  string bed_id = 1;
+  BedStatus status = 2;
+}
+
+message UpdateBedStatusResponse {
+  Bed bed = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message AdmitPatientRequest {
+  string bed_id = 1;
+  string patient_id = 2;
+}
+
+message AdmitPatientResponse {
+  Admission admission = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message DischargePatientRequest {
+  string admission_id = 1;
+  string discharged_by = 2;
+}
+
+message DischargePatientResponse {
+  Admission admission = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message GetAdmissionRequest {
+  string id = 1;
+}
+
+message GetAdmissionResponse {
+  Admission admission = 1;
+  nexus.main.v1.Error error = 2;
+}

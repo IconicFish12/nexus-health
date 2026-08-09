@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package nexus.main.v1;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+
+// RESPONSE STRUCTURE
+
+message ResponseStructure {
+  ResponseMetadata metadata = 1;
+  google.protobuf.Any payload = 2;
+  optional PaginationMeta pagination = 3;
+  optional Error error = 4;
+}
+
+message ResponseMetadata {
+  string request_id = 1;
+  string trace_id = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  int64 processing_time_ms = 4;
+  string producer_service_name = 5;
+  string producer_service_version = 6;
+}
+
+message PaginationMeta {
+  int32 page = 1;
+  int32 next = 2;
+  int32 prev = 3;
+  int32 total_items = 4;
+  int32 total_pages = 5;
+}
+
+// REQUEST STRUCTURE
+
+message RequestStructure {
+  RequestMetadata metadata = 1;
+  google.protobuf.Any payload = 2;
+  optional Error error = 3;
+}
+
+message RequestMetadata {
+  string request_id = 1;
+  string trace_id = 2;
+  string service_id = 3;
+  string service_version = 4;
+  string locale = 5;
+  string service_ip = 6;
+}
+
+message Error {
+  int32 status_code = 1;
+  string error_message = 2;
+  google.protobuf.Any error_cause = 3;
+}

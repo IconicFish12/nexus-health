@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package nexus.auth.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "nexus/auth/v1;authv1";
+
+enum Role {
+  ROLE_UNSPECIFIED       = 0;
+  ROLE_ADMIN             = 1;
+  ROLE_DOCTOR            = 2;
+  ROLE_NURSE             = 3;
+  ROLE_PHARMACIST        = 4;
+  ROLE_INVENTORY_MANAGER = 5;
+  ROLE_LAB_TECHNICIAN    = 6;
+  ROLE_RECEPTIONIST      = 7;
+  ROLE_FINANCE_CLERK     = 8;
+}
+
+message UserCredential {
+  string id = 1;
+  string staff_id = 2;
+  string email = 3;
+  Role role = 4;
+  bool is_active = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message RefreshToken {
+  string id = 1;
+  string token = 2;
+  string credential_id = 3;
+  google.protobuf.Timestamp expires_at = 4;
+  bool is_revoked = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+service AuthService {
+  rpc Register (RegisterRequest) returns (RegisterResponse);
+  rpc Login (LoginRequest) returns (LoginResponse);
+  rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
+  rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenResponse);
+  rpc GetCredentialByStaffId (GetCredentialByStaffIdRequest) returns (GetCredentialByStaffIdResponse);
+}
+
+message RegisterRequest {
+  string staff_id = 1;
+  string email = 2;
+  string password = 3;
+  Role role = 4;
+}
+
+message RegisterResponse {
+  UserCredential credential = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  UserCredential credential = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+}
+
+message ValidateTokenRequest {
+  string access_token = 1;
+}
+
+message ValidateTokenResponse {
+  bool is_valid = 1;
+  string credential_id = 2;
+  string staff_id = 3;
+  Role role = 4;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message GetCredentialByStaffIdRequest {
+  string staff_id = 1;
+}
+
+message GetCredentialByStaffIdResponse {
+  UserCredential credential = 1;
+}

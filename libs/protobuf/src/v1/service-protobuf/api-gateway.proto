@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package nexus.gateway.v1;
+
+import "google/protobuf/any.proto";
+import "v1/main.proto";
+
+option go_package = "nexus/gateway/v1;gatewayv1";
+
+message GatewayRequest {
+  nexus.main.v1.RequestMetadata metadata = 1;
+  string target_service = 2;
+  string target_method = 3;
+  google.protobuf.Any payload = 4;
+}
+
+message GatewayResponse {
+  nexus.main.v1.ResponseMetadata metadata = 1;
+  google.protobuf.Any payload = 2;
+  nexus.main.v1.PaginationMeta pagination = 3;
+  nexus.main.v1.Error error = 4;
+}
+
+service ApiGatewayService {
+  rpc ProxyCall (GatewayRequest) returns (GatewayResponse);
+}

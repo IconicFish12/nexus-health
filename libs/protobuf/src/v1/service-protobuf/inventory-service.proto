@@ -1,0 +1,182 @@
+syntax = "proto3";
+
+package nexus.inventory.v1;
+
+import "google/protobuf/timestamp.proto";
+import "v1/main.proto";
+
+option go_package = "nexus/inventory/v1;inventoryv1";
+
+enum SupplyCategory {
+  SUPPLY_CATEGORY_UNSPECIFIED  = 0;
+  SUPPLY_CATEGORY_BLOOD_BANK   = 1;
+  SUPPLY_CATEGORY_LAB_REAGENT  = 2;
+  SUPPLY_CATEGORY_SURGICAL     = 3;
+  SUPPLY_CATEGORY_PPE          = 4;
+  SUPPLY_CATEGORY_MEDICAL_GAS  = 5;
+  SUPPLY_CATEGORY_LINEN        = 6;
+  SUPPLY_CATEGORY_CONSUMABLE   = 7;
+  SUPPLY_CATEGORY_EQUIPMENT    = 8;
+}
+
+enum BloodType {
+  BLOOD_TYPE_UNSPECIFIED = 0;
+  BLOOD_TYPE_A           = 1;
+  BLOOD_TYPE_B           = 2;
+  BLOOD_TYPE_AB          = 3;
+  BLOOD_TYPE_O           = 4;
+}
+
+enum RhFactor {
+  RH_FACTOR_UNSPECIFIED = 0;
+  RH_FACTOR_POSITIVE   = 1;
+  RH_FACTOR_NEGATIVE   = 2;
+}
+
+enum BloodUnitStatus {
+  BLOOD_UNIT_STATUS_UNSPECIFIED = 0;
+  BLOOD_UNIT_STATUS_AVAILABLE   = 1;
+  BLOOD_UNIT_STATUS_RESERVED    = 2;
+  BLOOD_UNIT_STATUS_TRANSFUSED  = 3;
+  BLOOD_UNIT_STATUS_DISCARDED   = 4;
+  BLOOD_UNIT_STATUS_EXPIRED     = 5;
+}
+
+enum POStatus {
+  PO_STATUS_UNSPECIFIED        = 0;
+  PO_STATUS_DRAFT              = 1;
+  PO_STATUS_SUBMITTED          = 2;
+  PO_STATUS_PARTIALLY_RECEIVED = 3;
+  PO_STATUS_RECEIVED           = 4;
+  PO_STATUS_CANCELLED          = 5;
+}
+
+message SupplyItem {
+  string id = 1;
+  string name = 2;
+  string sku = 3;
+  SupplyCategory category = 4;
+  string unit_of_measure = 5;
+  int32 quantity_on_hand = 6;
+  int32 reorder_level = 7;
+  double unit_cost = 8;
+  optional string supplier_ref = 9;
+  optional string batch_code = 10;
+  optional google.protobuf.Timestamp expiration_date = 11;
+  google.protobuf.Timestamp updated_at = 12;
+}
+
+message BloodUnit {
+  string id = 1;
+  BloodType blood_type = 2;
+  RhFactor rh_factor = 3;
+  google.protobuf.Timestamp donation_date = 4;
+  optional string donor_id = 5;
+  google.protobuf.Timestamp expiration_date = 6;
+  BloodUnitStatus status = 7;
+  optional string reserved_for = 8;
+  optional string admission_id = 9;
+  optional google.protobuf.Timestamp transfused_at = 10;
+  optional string transfused_by = 11;
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp updated_at = 13;
+}
+
+service InventoryService {
+  rpc CreateSupplyItem (CreateSupplyItemRequest) returns (CreateSupplyItemResponse);
+  rpc GetSupplyItem (GetSupplyItemRequest) returns (GetSupplyItemResponse);
+  rpc ListSupplyItems (ListSupplyItemsRequest) returns (ListSupplyItemsResponse);
+  rpc ConsumeStock (ConsumeStockRequest) returns (ConsumeStockResponse);
+  
+  rpc RegisterBloodUnit (RegisterBloodUnitRequest) returns (RegisterBloodUnitResponse);
+  rpc ReserveBloodUnit (ReserveBloodUnitRequest) returns (ReserveBloodUnitResponse);
+  rpc TransfuseBloodUnit (TransfuseBloodUnitRequest) returns (TransfuseBloodUnitResponse);
+}
+
+message CreateSupplyItemRequest {
+  string name = 1;
+  string sku = 2;
+  SupplyCategory category = 3;
+  string unit_of_measure = 4;
+  int32 quantity_on_hand = 5;
+  int32 reorder_level = 6;
+  double unit_cost = 7;
+  optional string supplier_ref = 8;
+  optional string batch_code = 9;
+  optional google.protobuf.Timestamp expiration_date = 10;
+}
+
+message CreateSupplyItemResponse {
+  SupplyItem item = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message GetSupplyItemRequest {
+  string id = 1;
+}
+
+message GetSupplyItemResponse {
+  SupplyItem item = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message ListSupplyItemsRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  optional SupplyCategory category = 3;
+  optional string search = 4;
+}
+
+message ListSupplyItemsResponse {
+  repeated SupplyItem items = 1;
+  nexus.main.v1.PaginationMeta pagination = 2;
+  nexus.main.v1.Error error = 3;
+}
+
+message ConsumeStockRequest {
+  string item_id = 1;
+  int32 qty_consumed = 2;
+  string consumed_by = 3;
+  string department = 4;
+  optional string patient_id = 5;
+  optional string reason = 6;
+}
+
+message ConsumeStockResponse {
+  SupplyItem item = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message RegisterBloodUnitRequest {
+  BloodType blood_type = 1;
+  RhFactor rh_factor = 2;
+  google.protobuf.Timestamp donation_date = 3;
+  optional string donor_id = 4;
+  google.protobuf.Timestamp expiration_date = 5;
+}
+
+message RegisterBloodUnitResponse {
+  BloodUnit unit = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message ReserveBloodUnitRequest {
+  string blood_unit_id = 1;
+  string patient_id = 2;
+}
+
+message ReserveBloodUnitResponse {
+  BloodUnit unit = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message TransfuseBloodUnitRequest {
+  string blood_unit_id = 1;
+  string admission_id = 2;
+  string transfused_by = 3;
+}
+
+message TransfuseBloodUnitResponse {
+  BloodUnit unit = 1;
+  nexus.main.v1.Error error = 2;
+}
