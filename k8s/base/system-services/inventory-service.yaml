@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-service
+  namespace: nexus-service
+  labels:
+    app: inventory-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventory-service
+  template:
+    metadata:
+      labels:
+        app: inventory-service
+    spec:
+      initContainers:
+        - name: db-migration
+          image: nexus/inventory-service:1.0-early
+          command: ['bunx', 'prisma', 'migrate', 'deploy']
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: inventory-service-secret
+                  key: DATABASE_URL
+      containers:
+        - name: inventory-service
+          image: nexus-inventory-service:1.0-early
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3005
+              name: http
+          envFrom:
+            - configMapRef:
+                name: nexus-common-config
+          env:
+            - name: PORT
+              value: '3005'
+            - name: SERVICE_HTTP_PORT
+              value: '3005'
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: inventory-service-secret
+                  key: DATABASE_URL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-service-svc
+  namespace: nexus-service
+  labels:
+    app: inventory-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3005
+      targetPort: 3005
+      name: http
+  selector:
+    app: inventory-service

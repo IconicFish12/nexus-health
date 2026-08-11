@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ward-service
+  namespace: nexus-service
+  labels:
+    app: ward-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ward-service
+  template:
+    metadata:
+      labels:
+        app: ward-service
+    spec:
+      initContainers:
+        - name: db-migration
+          image: nexus/ward-service:1.0-early
+          command: ['bunx', 'prisma', 'migrate', 'deploy']
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ward-service-secret
+                  key: DATABASE_URL
+      containers:
+        - name: ward-service
+          image: nexus-ward-service:1.0-early
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3009
+              name: http
+          envFrom:
+            - configMapRef:
+                name: nexus-common-config
+          env:
+            - name: PORT
+              value: '3009'
+            - name: SERVICE_HTTP_PORT
+              value: '3009'
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ward-service-secret
+                  key: DATABASE_URL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ward-service-svc
+  namespace: nexus-service
+  labels:
+    app: ward-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3009
+      targetPort: 3009
+      name: http
+  selector:
+    app: ward-service

@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emr-service
+  namespace: nexus-service
+  labels:
+    app: emr-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emr-service
+  template:
+    metadata:
+      labels:
+        app: emr-service
+    spec:
+      initContainers:
+        - name: db-migration
+          image: nexus/emr-service:1.0-early
+          command: ['bunx', 'prisma', 'migrate', 'deploy']
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: emr-service-secret
+                  key: DATABASE_URL
+      containers:
+        - name: emr-service
+          image: nexus/emr-service:1.0-early
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3004
+              name: http
+          envFrom:
+            - configMapRef:
+                name: nexus-common-config
+          env:
+            - name: PORT
+              value: '3004'
+            - name: SERVICE_HTTP_PORT
+              value: '3004'
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: emr-service-secret
+                  key: DATABASE_URL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emr-service-svc
+  namespace: nexus-service
+  labels:
+    app: emr-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3004
+      targetPort: 3004
+      name: http
+  selector:
+    app: emr-service

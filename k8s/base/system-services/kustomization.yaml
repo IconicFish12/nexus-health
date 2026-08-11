@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - api-gateway.yaml
+  - auth-service.yaml
+  - appointment-service.yaml
+  - billing-service.yaml
+  - emr-service.yaml
+  - inventory-service.yaml
+  - notification-service.yaml
+  - pharmacy-service.yaml
+  - staff-service.yaml
+  - ward-service.yaml

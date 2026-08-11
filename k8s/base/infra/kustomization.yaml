@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - tools/postgres-db.yaml
+  - tools/nats.yaml
+  - tools/redis.yaml
+  - security/configmaps.yaml
+  - security/default-deny.yaml
+  - network/postgres-service.yaml
+  - network/nats-service.yaml
+  - network/redis-service.yaml
+  - network/grafana-service.yaml
+  - network/prometheus-service.yaml
+  - network/loki-service.yaml
+  - network/tempo-service.yaml
+  - network/otel-service.yaml
+  - network/alert-service.yaml
+  - observability/alloy.yaml
+  - observability/grafana.yaml
+  - observability/loki.yaml
+  - observability/promtheus.yaml
+  - observability/tempo.yaml
+  - observability/otel-collector.yaml
+  - observability/prome-alert.yaml
