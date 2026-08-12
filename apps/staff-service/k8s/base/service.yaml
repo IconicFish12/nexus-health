@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: staff-service-svc
+  namespace: nh-staff-service
+  labels:
+    app: staff-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5008
+      targetPort: 5008
+      name: http
+  selector:
+    app: staff-service

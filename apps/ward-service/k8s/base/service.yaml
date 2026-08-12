@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ward-service-svc
+  namespace: nh-ward-service
+  labels:
+    app: ward-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5009
+      targetPort: 5009
+      name: http
+  selector:
+    app: ward-service

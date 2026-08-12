@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pharmacy-service-svc
+  namespace: nh-pharmacy-service
+  labels:
+    app: pharmacy-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5007
+      targetPort: 5007
+      name: http
+  selector:
+    app: pharmacy-service

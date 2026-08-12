@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: appointment-service-svc
+  namespace: nh-appointment-service
+  labels:
+    app: appointment-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5001
+      targetPort: 5001
+      name: http
+  selector:
+    app: appointment-service
