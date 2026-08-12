@@ -2,11 +2,11 @@
   "name": "protobuf",
   "type": "module",
   "private": true,
+  "exports": {
+    "./*": "./src/*"
+  },
   "devDependencies": {
-    "@protobuf-ts/plugin": "^2.11.1",
-    "@types/bun": "latest",
-    "grpc-tools": "^1.13.1",
-    "protoc": "^35.1.0"
+    "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.9.3"
