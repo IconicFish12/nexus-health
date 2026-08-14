@@ -1,0 +1,84 @@
+name: 'Build and Push Docker Image CI'
+
+on:
+  workflow_call:
+    inputs:
+      image-tag:
+        description: 'Docker image tag (e.g. commit SHA or version tag)'
+        required: true
+        type: string
+      registry:
+        description: 'Docker Registry / Organization'
+        required: false
+        type: string
+        default: 'docker.io'
+    secrets:
+      docker_username:
+        description: 'Docker Hub Username'
+        required: true
+      docker_password:
+        description: 'Docker Hub Token / Password'
+        required: true
+
+jobs:
+  build-scan-push:
+    name: Build, Scan & Push Service Container Image
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - api-gateway
+          - auth-service
+          - appointment-service
+          - billing-service
+          - emr-service
+          - inventory-service
+          - notification-service
+          - pharmacy-service
+          - staff-service
+          - ward-service
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ inputs.registry }}
+          username: ${{ secrets.docker_username }}
+          password: ${{ secrets.docker_password }}
+
+      - name: Build local container image for testing
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: apps/${{ matrix.service }}/Dockerfile
+          load: true
+          tags: ${{ secrets.docker_username }}/nexus-${{ matrix.service }}:${{ inputs.image-tag }}
+
+      - name: Trivy Container Image Security Scan
+        uses: aquasecurity/trivy-action@0.36.0
+        with:
+          scan-type: 'image'
+          image-ref: '${{ secrets.docker_username }}/nexus-${{ matrix.service }}:${{ inputs.image-tag }}'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
+
+      - name: Push Container Image to Registry
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: apps/${{ matrix.service }}/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.docker_username }}/nexus-${{ matrix.service }}:${{ inputs.image-tag }}
+            ${{ secrets.docker_username }}/nexus-${{ matrix.service }}:latest

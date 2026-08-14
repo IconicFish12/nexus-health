@@ -7,6 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build --builder swc",
+    "build:turbo": "bunx turbo build",
     "format": "bunx prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start --builder swc",
     "start:dev": "nest start --watch --builder swc",

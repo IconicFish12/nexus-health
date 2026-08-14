@@ -1,0 +1,65 @@
+name: 'Default CI Workflow'
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'Node.js version to setup'
+        required: false
+        type: string
+        default: '22'
+      bun-version:
+        description: 'Bun version to setup'
+        required: false
+        type: string
+        default: 'latest'
+      turborepo-team:
+        description: 'Turborepo remote cache team name'
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  build-and-test:
+    name: Build & Test Codebase
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun runtime
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ inputs.bun-version }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Install dependencies
+        run: bun ci
+
+      - name: Setup Turborepo remote cache
+        if: ${{ inputs.turborepo-team != '' }}
+        uses: vercel/setup-turborepo-remote-cache-action@v1
+        with:
+          team: ${{ inputs.turborepo-team }}
+
+      - name: Build codebase (NestJS & Turborepo)
+        run: |
+          bun run build
+          bun run build:turbo
+
+      - name: Run unit tests
+        run: bun run test
+
+      - name: Run test coverage
+        run: bun run test:cov
