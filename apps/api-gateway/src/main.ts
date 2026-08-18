@@ -1,19 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { ApiGatewayModule } from './api-gateway.module';
 import { Transport, type MicroserviceOptions } from '@nestjs/microservices';
+import type { INestApplication } from '@nestjs/common';
+import { apiGatewayProtobuf, appointmentServiceProtobuf } from '@app/protobuf';
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-    ApiGatewayModule,
-    {
-      transport: Transport.NATS,
-      options: {
-        name: 'api-gateway',
-        debug: true,
-      },
-    },
-  );
-  const port = process.env.PORT ?? process.env.SERVICE_HTTP_PORT ?? 3000;
+  const app = await NestFactory.create<INestApplication>(ApiGatewayModule);
+
+  // GRPC transport
+  app.connectMicroservice<MicroserviceOptions>(apiGatewayProtobuf);
+
+  const port = process.env.PORT ?? process.env.SERVICE_HTTP_PORT ?? 5000;
   await app.listen(port);
 }
 bootstrap();
