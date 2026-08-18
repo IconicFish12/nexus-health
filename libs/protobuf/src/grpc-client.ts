@@ -3,7 +3,7 @@ import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 
 export class GrpcClient {
-  constructor(private readonly config: ConfigService) {}
+  constructor(private readonly config: ConfigService = new ConfigService()) {}
 
   private getGrpcUrl(
     defaultHost?: string,

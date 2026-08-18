@@ -3,7 +3,7 @@ import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 
 export class GrpcHost {
-  constructor(private readonly config: ConfigService) {}
+  constructor(private readonly config: ConfigService = new ConfigService()) {}
 
   private getGrpcUrl(
     defaultHost?: string,
@@ -11,7 +11,9 @@ export class GrpcHost {
     servicePrefix?: string,
   ): string {
     const host =
-      this.config.get<string>(`${servicePrefix}_GRPC_HOST`) || 'localhost';
+      this.config.get<string>(`${servicePrefix}_GRPC_HOST`) ||
+      this.config.get<string>('GRPC_HOST') ||
+      '0.0.0.0';
 
     const port =
       this.config.get<number>(`${servicePrefix}_GRPC_PORT`) || defaultPort;
