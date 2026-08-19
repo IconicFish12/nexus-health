@@ -2,12 +2,22 @@ import { Module } from '@nestjs/common';
 import { ApiGatewayController } from './api-gateway.controller';
 import { ApiGatewayService } from './api-gateway.service';
 import { ClientsModule } from '@nestjs/microservices';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import { GrpcClient } from '@app/protobuf';
+import { HealthModule } from './health/health.module';
 
 const grpcClient = new GrpcClient();
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
+    HealthModule,
     ClientsModule.register([
       {
         name: 'APPOINTMENT-SERVICE',
@@ -48,6 +58,12 @@ const grpcClient = new GrpcClient();
     ]),
   ],
   controllers: [ApiGatewayController],
-  providers: [ApiGatewayService],
+  providers: [
+    ApiGatewayService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class ApiGatewayModule {}
