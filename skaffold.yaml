@@ -1,0 +1,149 @@
+apiVersion: skaffold/v4beta14
+kind: Config
+metadata:
+  name: nexus-healthcare-system
+manifests:
+  kustomize:
+    paths:
+      - apps/api-gateway/k8s
+profiles:
+  - name: base
+    manifests:
+      kustomize:
+        paths:
+          - apps/api-gateway/k8s/base
+  - name: overlays
+    manifests:
+      kustomize:
+        paths:
+          - apps/api-gateway/k8s/overlays
+  - name: production
+    manifests:
+      kustomize:
+        paths:
+          - apps/api-gateway/k8s/overlays/production
+  - name: staging
+    manifests:
+      kustomize:
+        paths:
+          - apps/api-gateway/k8s/overlays/staging
+  - name: production
+    manifests:
+      kustomize:
+        paths:
+          - apps/appointment-service/k8s/overlays/production
+  - name: staging
+    manifests:
+      kustomize:
+        paths:
+          - apps/appointment-service/k8s/overlays/staging
+  - name: production
+    manifests:
+      kustomize:
+        paths:
+          - apps/auth-service/k8s/overlays/production
+  - name: staging
+    manifests:
+      kustomize:
+        paths:
+          - apps/auth-service/k8s/overlays/staging
+  - name: production
+    manifests:
+      kustomize:
+        paths:
+          - apps/billing-service/k8s/overlays/production
+  - name: staging
+    manifests:
+      kustomize:
+        paths:
+          - apps/billing-service/k8s/overlays/staging
+  - name: production
+    manifests:
+      kustomize:
+        paths:
+          - apps/emr-service/k8s/overlays/production
+  - name: staging
+    manifests:
+      kustomize:
+        paths:
+          - apps/emr-service/k8s/overlays/staging
+  - name: production
+    manifests:
+      kustomize:
+        paths:
+          - apps/inventory-service/k8s/overlays/production
+  - name: staging
+    manifests:
+      kustomize:
+        paths:
+          - apps/inventory-service/k8s/overlays/staging
+  - name: production
+    manifests:
+      kustomize:
+        paths:
+          - apps/notification-service/k8s/overlays/production
+  - name: staging
+    manifests:
+      kustomize:
+        paths:
+          - apps/notification-service/k8s/overlays/staging
+  - name: production
+    manifests:
+      kustomize:
+        paths:
+          - apps/pharmacy-service/k8s/overlays/production
+  - name: staging
+    manifests:
+      kustomize:
+        paths:
+          - apps/pharmacy-service/k8s/overlays/staging
+  - name: production
+    manifests:
+      kustomize:
+        paths:
+          - apps/staff-service/k8s/overlays/production
+  - name: staging
+    manifests:
+      kustomize:
+        paths:
+          - apps/staff-service/k8s/overlays/staging
+  - name: production
+    manifests:
+      kustomize:
+        paths:
+          - apps/ward-service/k8s/overlays/production
+  - name: staging
+    manifests:
+      kustomize:
+        paths:
+          - apps/ward-service/k8s/overlays/staging
+  - name: k8s
+    manifests:
+      kustomize:
+        paths:
+          - k8s
+  - name: base
+    manifests:
+      kustomize:
+        paths:
+          - k8s/base
+  - name: infra
+    manifests:
+      kustomize:
+        paths:
+          - k8s/base/infra
+  - name: overlays
+    manifests:
+      kustomize:
+        paths:
+          - k8s/overlays
+  - name: production
+    manifests:
+      kustomize:
+        paths:
+          - k8s/overlays/production
+  - name: staging
+    manifests:
+      kustomize:
+        paths:
+          - k8s/overlays/staging

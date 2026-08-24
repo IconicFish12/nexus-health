@@ -17,9 +17,7 @@ export class GrpcToHttpExceptionFilter implements ExceptionFilter {
     const httpStatus = this.mapGrpcToHttpStatus(grpcCode);
 
     const message =
-      exception.details ||
-      exception.message ||
-      'An unexpected error occurred';
+      exception.details || exception.message || 'An unexpected error occurred';
 
     response.status(httpStatus).json({
       statusCode: httpStatus,

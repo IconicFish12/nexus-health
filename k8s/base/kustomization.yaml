@@ -4,5 +4,14 @@ kind: Kustomization
 resources:
   - namespace-infra.yaml
   - namespace-service.yaml
+  - security/root-configmaps.yaml
+  - security/default-deny.yaml
+  - network/nats-service.yaml
+  - network/redis-service.yaml
+  - network/grafana-service.yaml
+  - network/prometheus-service.yaml
+  - network/loki-service.yaml
+  - network/tempo-service.yaml
+  - network/otel-service.yaml
+  - network/alert-service.yaml
   - infra
-  - system-services
