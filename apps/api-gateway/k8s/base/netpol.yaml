@@ -1,0 +1,49 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-gateway-netpol
+  namespace: nexus-service
+spec:
+  podSelector:
+    matchLabels:
+      app: api-gateway
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow incoming traffic from Caddy / Ingress Controller or external clients
+    - ports:
+        - protocol: TCP
+          port: 5000
+        - protocol: TCP
+          port: 50050
+  egress:
+    # Allow DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+    # Allow connectivity to Infrastructure Services (NATS, Redis, OTel) in nexus-infra
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: nexus-infra
+      ports:
+        - protocol: TCP
+          port: 4222 # NATS
+        - protocol: TCP
+          port: 6379 # Redis
+        - protocol: TCP
+          port: 4317 # OTel gRPC
+        - protocol: TCP
+          port: 4318 # OTel HTTP
+
+    # Allow connectivity to backend microservices in nexus-service
+    - to:
+        - podSelector: {}
