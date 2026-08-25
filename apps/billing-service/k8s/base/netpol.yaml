@@ -1,0 +1,54 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: billing-service-netpol
+  namespace: nexus-service
+spec:
+  podSelector:
+    matchLabels:
+      app: billing-service
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow incoming traffic on HTTP (5003) and gRPC (500053)
+    - ports:
+        - protocol: TCP
+          port: 5003
+        - protocol: TCP
+          port: 500053
+  egress:
+    # Allow DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+    # Allow egress to infrastructure in nexus-infra (NATS, Redis, OTel)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: nexus-infra
+      ports:
+        - protocol: TCP
+          port: 4222 # NATS
+        - protocol: TCP
+          port: 6379 # Redis
+        - protocol: TCP
+          port: 4317 # OTel gRPC
+        - protocol: TCP
+          port: 4318 # OTel HTTP
+
+    # Allow egress to its dedicated PostgreSQL database pod in nexus-service
+    - to:
+        - podSelector:
+            matchLabels:
+              app: billing-postgres
+      ports:
+        - protocol: TCP
+          port: 5432
