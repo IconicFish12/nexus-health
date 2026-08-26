@@ -2,14 +2,18 @@ apiVersion: v1
 kind: Service
 metadata:
   name: staff-service-svc
-  namespace: nh-staff-service
+  namespace: nexus-service
   labels:
-    app: staff-service
+    app.kubernetes.io/name: staff-service
+    app.kubernetes.io/part-of: nexus-healthcare-system
 spec:
   type: ClusterIP
   ports:
     - port: 5008
       targetPort: 5008
       name: http
+    - port: 500058
+      targetPort: 500058
+      name: grpc
   selector:
     app: staff-service

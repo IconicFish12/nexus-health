@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ward-service-pdb
+  namespace: nexus-service
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: ward-service

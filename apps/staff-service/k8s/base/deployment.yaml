@@ -2,11 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: staff-service
-  namespace: nh-staff-service
+  namespace: nexus-service
   labels:
-    app: staff-service
+    app.kubernetes.io/name: staff-service
+    app.kubernetes.io/part-of: nexus-healthcare-system
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: staff-service
@@ -17,14 +23,14 @@ spec:
     spec:
       initContainers:
         - name: db-migration
-          image: nexus/staff-service:1.0-early
+          image: nexus-staff-service:1.0-early
+          imagePullPolicy: IfNotPresent
           command: ['bunx', 'prisma', 'migrate', 'deploy']
-          env:
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: staff-service-secret
-                  key: DATABASE_URL
+          envFrom:
+            - configMapRef:
+                name: staff-service-config
+            - secretRef:
+                name: staff-service-secret
       containers:
         - name: staff-service
           image: nexus-staff-service:1.0-early
@@ -32,16 +38,31 @@ spec:
           ports:
             - containerPort: 5008
               name: http
+            - containerPort: 500058
+              name: grpc
           envFrom:
             - configMapRef:
                 name: nexus-common-config
-          env:
-            - name: PORT
-              value: '5008'
-            - name: SERVICE_HTTP_PORT
-              value: '5008'
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: staff-service-secret
-                  key: DATABASE_URL
+            - configMapRef:
+                name: staff-service-config
+            - secretRef:
+                name: staff-service-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5008
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5008
+            initialDelaySeconds: 15
+            periodSeconds: 15

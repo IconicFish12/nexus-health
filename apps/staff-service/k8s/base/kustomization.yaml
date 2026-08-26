@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: nexus-service
+
+resources:
+  - configmap.yaml
+  - secrets.yaml
+  - postgres-db.yaml
+  - deployment.yaml
+  - service.yaml
+  - netpol.yaml
+  - hpa.yaml
+  - pdb.yaml
