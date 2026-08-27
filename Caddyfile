@@ -1,3 +1,148 @@
-localhost:8080, :80 {
+{
+	# Global options for production traffic rush performance
+	admin off
 
+	servers {
+		timeouts {
+			read_header 5s
+			read_body 10s
+			write 30s
+			idle 2m
+		}
+		max_header_size 16KB
+	}
+}
+
+# Main Edge Reverse Proxy & Load Balancer Block
+:80, :8080, localhost:8080 {
+	# Response Compression for production bandwidth optimization
+	encode zstd gzip
+
+	# Security & Hardening Headers
+	header {
+		X-Frame-Options "DENY"
+		X-Content-Type-Options "nosniff"
+		X-XSS-Protection "1; mode=block"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# Request limits to protect backend services from payload flooding during production rush
+	request_body {
+		max_size 10MB
+	}
+
+	# Edge Health Check Endpoint
+	handle /health {
+		respond "Caddy Edge Proxy Healthy" 200
+	}
+
+	# Primary Reverse Proxy & Load Balancer to API Gateway Cluster
+	handle /api/* {
+		reverse_proxy api-gateway:5000 {
+			# Load balancing policy: least_conn distributes production rush traffic to least-busy instances
+			lb_policy least_conn
+
+			# Upstream Active Health Checks
+			health_uri /health
+			health_interval 5s
+			health_timeout 2s
+			health_status 200
+
+			# Circuit Breaker & Failover Configuration
+			fail_duration 10s
+			max_fails 3
+			unhealthy_status 5xx
+
+			# High Load Retry Policy
+			lb_try_duration 3s
+			lb_try_interval 250ms
+
+			# Forwarding Header for Client Host
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+		}
+	}
+
+	# Microservice Direct Load Balancing / Failover Routes
+	handle /auth/* {
+		reverse_proxy auth-service:5002 {
+			lb_policy least_conn
+			health_uri /health
+			health_interval 5s
+			fail_duration 10s
+		}
+	}
+
+	handle /appointments/* {
+		reverse_proxy appointment-service:5001 {
+			lb_policy least_conn
+			health_uri /health
+			health_interval 5s
+			fail_duration 10s
+		}
+	}
+
+	handle /billing/* {
+		reverse_proxy billing-service:5003 {
+			lb_policy least_conn
+			health_uri /health
+			health_interval 5s
+			fail_duration 10s
+		}
+	}
+
+	handle /emr/* {
+		reverse_proxy emr-service:5004 {
+			lb_policy least_conn
+			health_uri /health
+			health_interval 5s
+			fail_duration 10s
+		}
+	}
+
+	handle /inventory/* {
+		reverse_proxy inventory-service:5005 {
+			lb_policy least_conn
+			health_uri /health
+			health_interval 5s
+			fail_duration 10s
+		}
+	}
+
+	handle /pharmacy/* {
+		reverse_proxy pharmacy-service:5007 {
+			lb_policy least_conn
+			health_uri /health
+			health_interval 5s
+			fail_duration 10s
+		}
+	}
+
+	handle /staff/* {
+		reverse_proxy staff-service:5008 {
+			lb_policy least_conn
+			health_uri /health
+			health_interval 5s
+			fail_duration 10s
+		}
+	}
+
+	handle /ward/* {
+		reverse_proxy ward-service:5009 {
+			lb_policy least_conn
+			health_uri /health
+			health_interval 5s
+			fail_duration 10s
+		}
+	}
+
+	# Default Catch-all -> Route to API Gateway Load Balancer
+	handle {
+		reverse_proxy api-gateway:5000 {
+			lb_policy round_robin
+			fail_duration 10s
+			max_fails 3
+		}
+	}
 }

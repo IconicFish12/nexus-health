@@ -15,6 +15,8 @@ spec:
       labels:
         app: grafana-dashboard
     spec:
+      nodeSelector:
+        workload: system-infra
       containers:
         - name: grafana-dashboard
           image: grafana/grafana:latest

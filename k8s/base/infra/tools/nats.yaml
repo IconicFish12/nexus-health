@@ -16,6 +16,8 @@ spec:
       labels:
         app: nats
     spec:
+      nodeSelector:
+        workload: system-infra
       containers:
         - name: nats
           image: nats:2.10-alpine

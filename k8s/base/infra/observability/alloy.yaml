@@ -16,6 +16,8 @@ spec:
       labels:
         app: alloy
     spec:
+      nodeSelector:
+        workload: system-infra
       tolerations:
         - key: node-role.kubernetes.io/master
           effect: NoSchedule
