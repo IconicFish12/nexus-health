@@ -9,5 +9,6 @@ resources:
   - observability/loki.yaml
   - observability/promtheus.yaml
   - observability/tempo.yaml
+  - observability/tempo-configmap.yaml
   - observability/otel-collector.yaml
   - observability/prome-alert.yaml
