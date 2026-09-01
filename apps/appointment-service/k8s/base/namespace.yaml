@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: nh-appointment-service
-  labels:
-    name: nh-appointment-service

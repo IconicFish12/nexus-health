@@ -21,9 +21,13 @@ spec:
       labels:
         app: api-gateway
     spec:
+      imagePullSecrets:
+        - name: regcred
+      nodeSelector:
+        workload: system-service
       containers:
         - name: api-gateway
-          image: nexus-api-gateway:1.0-early
+          image: docker.io/isyawal16/nexus-api-gateway:1.0-early
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
@@ -31,8 +35,6 @@ spec:
             - containerPort: 50050
               name: grpc
           envFrom:
-            - configMapRef:
-                name: nexus-common-config
             - configMapRef:
                 name: api-gateway-config
             - secretRef:
@@ -44,15 +46,15 @@ spec:
             limits:
               cpu: '500m'
               memory: '512Mi'
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 5000
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 5000
-            initialDelaySeconds: 15
-            periodSeconds: 15
+          # readinessProbe:
+          #  httpGet:
+          #    path: /health
+          #    port: 5000
+          #  initialDelaySeconds: 5
+          #  periodSeconds: 10
+          # livenessProbe:
+          #   httpGet:
+          #    path: /health
+          #    port: 5000
+          #  initialDelaySeconds: 15
+          #  periodSeconds: 15

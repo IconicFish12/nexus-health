@@ -10,7 +10,9 @@ import { GrpcToHttpExceptionFilter } from '@app/common';
 async function bootstrap() {
   const app = await NestFactory.create<INestApplication>(ApiGatewayModule);
 
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', {
+    exclude: ['health'],
+  });
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: '1',

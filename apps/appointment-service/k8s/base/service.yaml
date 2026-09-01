@@ -12,8 +12,8 @@ spec:
     - port: 5001
       targetPort: 5001
       name: http
-    - port: 500051
-      targetPort: 500051
+    - port: 50051
+      targetPort: 50051
       name: grpc
   selector:
     app: appointment-service

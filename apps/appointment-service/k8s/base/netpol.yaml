@@ -16,7 +16,7 @@ spec:
         - protocol: TCP
           port: 5001
         - protocol: TCP
-          port: 500051
+          port: 50051
   egress:
     # Allow DNS resolution
     - to:

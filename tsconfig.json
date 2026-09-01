@@ -31,7 +31,7 @@
         "libs/common/src/*"
       ],
       "@app/protobuf": [
-        "libs/protobuf/src/index.ts"
+        "libs/protobuf/src"
       ],
       "@app/protobuf/*": [
         "libs/protobuf/src/*"

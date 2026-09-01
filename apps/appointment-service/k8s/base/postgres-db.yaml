@@ -7,9 +7,10 @@ metadata:
     app: appointment-postgres
     app.kubernetes.io/name: appointment-postgres
     app.kubernetes.io/part-of: nexus-healthcare-system
+    app.kubernetes.io/component: database
 spec:
   serviceName: appointment-postgres-svc
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: appointment-postgres
@@ -18,24 +19,26 @@ spec:
       labels:
         app: appointment-postgres
     spec:
+      nodeSelector:
+        workload: system-infra
       containers:
         - name: postgres
           image: postgres:17-alpine
           imagePullPolicy: IfNotPresent
           env:
-            - name: POSTGRES_USER
+            - name: POSTGRE_USER
               valueFrom:
                 secretKeyRef:
                   name: appointment-service-secret
                   key: DB_USER
-            - name: POSTGRES_PASSWORD
+            - name: POSTGRE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: appointment-service-secret
                   key: DB_PASSWORD
-            - name: POSTGRES_DB
+            - name: POSTGRE_DATABASE
               valueFrom:
-                configMapRef:
+                configMapKeyRef:
                   name: appointment-service-config
                   key: DB_NAME
           ports:
@@ -43,19 +46,19 @@ spec:
               name: postgres
           resources:
             requests:
-              cpu: "100m"
-              memory: "128Mi"
+              cpu: '100m'
+              memory: '128Mi'
             limits:
-              cpu: "500m"
-              memory: "512Mi"
+              cpu: '500m'
+              memory: '512Mi'
           readinessProbe:
             exec:
-              command: ["cmd", "pg_isready", "-U", "postgres"]
+              command: ['cmd', 'pg_isready', '-U', 'postgres']
             initialDelaySeconds: 5
             periodSeconds: 5
           livenessProbe:
             exec:
-              command: ["cmd", "pg_isready", "-U", "postgres"]
+              command: ['cmd', 'pg_isready', '-U', 'postgres']
             initialDelaySeconds: 15
             periodSeconds: 10
           volumeMounts:
@@ -65,25 +68,7 @@ spec:
     - metadata:
         name: appointment-psql-data
       spec:
-        accessModes: ["ReadWriteOnce"]
+        accessModes: ['ReadWriteOnce']
         resources:
           requests:
             storage: 10Gi
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: appointment-postgres-svc
-  namespace: nexus-service
-  labels:
-    app: appointment-postgres
-    app.kubernetes.io/name: appointment-postgres
-    app.kubernetes.io/part-of: nexus-healthcare-system
-spec:
-  type: ClusterIP
-  ports:
-    - port: 5432
-      targetPort: 5432
-      name: postgres
-  selector:
-    app: appointment-postgres

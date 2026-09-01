@@ -21,9 +21,13 @@ spec:
       labels:
         app: appointment-service
     spec:
+      nodeSelector:
+        workload: system-service
+      imagePullSecrets:
+        - name: regcred
       initContainers:
         - name: db-migration
-          image: nexus-appointment-service:1.0-early
+          image: docker.io/isyawal16/nexus-appointment-service:1.0-early
           imagePullPolicy: IfNotPresent
           command: ['bunx', 'prisma', 'migrate', 'deploy']
           envFrom:
@@ -33,36 +37,34 @@ spec:
                 name: appointment-service-secret
       containers:
         - name: appointment-service
-          image: nexus-appointment-service:1.0-early
+          image: docker.io/isyawal16/nexus-appointment-service:1.0-early
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5001
               name: http
-            - containerPort: 500051
+            - containerPort: 50051
               name: grpc
           envFrom:
-            - configMapRef:
-                name: nexus-common-config
             - configMapRef:
                 name: appointment-service-config
             - secretRef:
                 name: appointment-service-secret
           resources:
             requests:
-              cpu: "100m"
-              memory: "128Mi"
+              cpu: '100m'
+              memory: '128Mi'
             limits:
-              cpu: "500m"
-              memory: "512Mi"
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 5001
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 5001
-            initialDelaySeconds: 15
-            periodSeconds: 15
+              cpu: '500m'
+              memory: '512Mi'
+          # readinessProbe:
+          #  httpGet:
+          #    path: /health
+          #    port: 5001
+          #  initialDelaySeconds: 5
+          #  periodSeconds: 10
+          # livenessProbe:
+          #  httpGet:
+          #    path: /health
+          #    port: 5001
+          #  initialDelaySeconds: 15
+          #  periodSeconds: 15

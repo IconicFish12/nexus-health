@@ -1,2 +1,4 @@
-export { GrpcClient } from './grpc-client';
-export { GrpcHost } from './grpc-host';
+import { GrpcClient } from './grpc-client';
+import { GrpcHost } from './grpc-host';
+
+export { GrpcClient, GrpcHost };
