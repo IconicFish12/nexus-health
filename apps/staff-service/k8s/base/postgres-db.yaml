@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: staff-postgres
+  namespace: nexus-service
+  labels:
+    app: staff-postgres
+    app.kubernetes.io/name: staff-postgres
+    app.kubernetes.io/part-of: nexus-healthcare-system
+spec:
+  serviceName: staff-postgres-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app: staff-postgres
+  template:
+    metadata:
+      labels:
+        app: staff-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17-alpine
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: staff-service-secret
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: staff-service-secret
+                  key: DB_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapRef:
+                  name: staff-service-config
+                  key: DB_NAME
+          ports:
+            - containerPort: 5432
+              name: postgres
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            exec:
+              command: ["cmd", "pg_isready", "-U", "postgres"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["cmd", "pg_isready", "-U", "postgres"]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          volumeMounts:
+            - name: staff-psql-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: staff-psql-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: staff-postgres-svc
+  namespace: nexus-service
+  labels:
+    app: staff-postgres
+    app.kubernetes.io/name: staff-postgres
+    app.kubernetes.io/part-of: nexus-healthcare-system
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgres
+  selector:
+    app: staff-postgres

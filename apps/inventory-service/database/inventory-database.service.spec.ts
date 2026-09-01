@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { InventoryDatabaseService } from './inventory-database.service.ts';
+import { InventoryDatabaseService } from './inventory-database.service';
 
 describe('InventoryDatabaseService', () => {
   let service: InventoryDatabaseService;

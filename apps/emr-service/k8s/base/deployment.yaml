@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emr-service
+  namespace: nexus-service
+  labels:
+    app.kubernetes.io/name: emr-service
+    app.kubernetes.io/part-of: nexus-healthcare-system
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: emr-service
+  template:
+    metadata:
+      labels:
+        app: emr-service
+    spec:
+      initContainers:
+        - name: db-migration
+          image: nexus-emr-service:1.0-early
+          imagePullPolicy: IfNotPresent
+          command: ['bunx', 'prisma', 'migrate', 'deploy']
+          envFrom:
+            - configMapRef:
+                name: emr-service-config
+            - secretRef:
+                name: emr-service-secret
+      containers:
+        - name: emr-service
+          image: nexus-emr-service:1.0-early
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5004
+              name: http
+            - containerPort: 500054
+              name: grpc
+          envFrom:
+            - configMapRef:
+                name: nexus-common-config
+            - configMapRef:
+                name: emr-service-config
+            - secretRef:
+                name: emr-service-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5004
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5004
+            initialDelaySeconds: 15
+            periodSeconds: 15

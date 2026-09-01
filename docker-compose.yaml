@@ -1,4 +1,4 @@
-name: nexus-heatlhcare-system
+name: nexus-healthcare-system
 
 networks:
   system_network:
@@ -15,17 +15,43 @@ volumes:
   tempo_data:
 
 services:
-  # infrastructure
-  # 1. Main Config
+  # -------------------------------------------------------------
+  # Infrastructure Services
+  # -------------------------------------------------------------
+  postgres:
+    image: postgres:17-alpine
+    container_name: nexus-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Isyawal161104}
+      POSTGRES_MULTIPLE_DATABASES: 'auth-db,appointment-db,billing-db,emr-db,inventory-db,pharmacy-db,staff-db,ward-db'
+    ports:
+      - '5432:5432'
+    volumes:
+      - psql_data:/var/lib/postgresql/data
+      - ./scripts/init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
+    networks:
+      - system_network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   caddy:
     image: caddy:2.11-alpine
     container_name: nexus-caddy
     restart: unless-stopped
     cap_add:
       - NET_ADMIN
+    ports:
+      - '80:80'
+      - '443:443'
+      - '8080:8080'
     volumes:
-      - $PWD/conf:/etc/caddy
-      - $PWD/site:/srv
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./site:/srv
       - caddy_data:/data
       - caddy_config:/config
     networks:
@@ -48,7 +74,7 @@ services:
     container_name: nexus-redis
     restart: always
     ports:
-      - '6380:6379' # Host port 6380 -> Container port 6379
+      - '6380:6379'
     volumes:
       - redis_data:/data
     networks:
@@ -67,9 +93,9 @@ services:
     volumes:
       - ./docker/monitoring/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro,z
     ports:
-      - '4317:4317' # OTLP gRPC Receiver (NestJS Services)
-      - '4318:4318' # OTLP HTTP Receiver
-      - '8889:8889' # Prometheus Exporter Scrape Endpoint
+      - '4317:4317'
+      - '4318:4318'
+      - '8889:8889'
     networks:
       - system_network
 
@@ -128,8 +154,8 @@ services:
     volumes:
       - ./loki_config.yaml:/etc/loki/config.yml:ro
     ports:
-      - '3100:3100' # HTTP port address
-      - '9096:9096' # gRPC port address
+      - '3100:3100'
+      - '9096:9096'
     networks:
       - system_network
 
@@ -142,7 +168,7 @@ services:
       - ./tempo.yaml:/etc/tempo/tempo.yaml:ro
       - tempo_data:/var/tempo
     ports:
-      - '3200:3200' # Tempo HTTP
+      - '3200:3200'
     networks:
       - system_network
 
@@ -158,4 +184,245 @@ services:
     networks:
       - system_network
 
-  # system services
+  # -------------------------------------------------------------
+  # System Microservices
+  # -------------------------------------------------------------
+  api-gateway:
+    image: nexus-api-gateway:1.0-early
+    container_name: nexus-api-gateway
+    build:
+      context: .
+      dockerfile: apps/api-gateway/Dockerfile
+    ports:
+      - '5000:5000'
+    environment:
+      - NODE_ENV=production
+      - SERVICE_HTTP_PORT=3000
+      - NATS_SERVER=nats://nats:4222
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - nats
+      - redis
+    networks:
+      - system_network
+
+  auth-service:
+    image: nexus/auth-service:1.0-early
+    container_name: nexus-auth-service
+    build:
+      context: .
+      dockerfile: apps/auth-service/Dockerfile
+    ports:
+      - '5001:5001'
+    environment:
+      - NODE_ENV=production
+      - SERVICE_HTTP_PORT=3001
+      - DATABASE_URL=postgresql://postgres:Isyawal161104@postgres:5432/auth-db?schema=public
+      - NATS_SERVER=nats://nats:4222
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    networks:
+      - system_network
+
+  appointment-service:
+    image: nexus-appointment-service:1.0-early
+    container_name: nexus-appointment-service
+    build:
+      context: .
+      dockerfile: apps/appointment-service/Dockerfile
+    ports:
+      - '5002:5002'
+    environment:
+      - NODE_ENV=production
+      - SERVICE_HTTP_PORT=3002
+      - DATABASE_URL=postgresql://postgres:Isyawal161104@postgres:5432/appointment-db?schema=public
+      - NATS_SERVER=nats://nats:4222
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    networks:
+      - system_network
+
+  billing-service:
+    image: nexus-billing-service:1.0-early
+    container_name: nexus-billing-service
+    build:
+      context: .
+      dockerfile: apps/billing-service/Dockerfile
+    ports:
+      - '5003:5003'
+    environment:
+      - NODE_ENV=production
+      - SERVICE_HTTP_PORT=3003
+      - DATABASE_URL=postgresql://postgres:Isyawal161104@postgres:5432/billing-db?schema=public
+      - NATS_SERVER=nats://nats:4222
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    networks:
+      - system_network
+
+  emr-service:
+    image: nexus-emr-service:1.0-early
+    container_name: nexus-emr-service
+    build:
+      context: .
+      dockerfile: apps/emr-service/Dockerfile
+    ports:
+      - '5004:5004'
+    environment:
+      - NODE_ENV=production
+      - SERVICE_HTTP_PORT=3004
+      - DATABASE_URL=postgresql://postgres:Isyawal161104@postgres:5432/emr-db?schema=public
+      - NATS_SERVER=nats://nats:4222
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    networks:
+      - system_network
+
+  inventory-service:
+    image: nexus-inventory-service:1.0-early
+    container_name: nexus-inventory-service
+    build:
+      context: .
+      dockerfile: apps/inventory-service/Dockerfile
+    ports:
+      - '5005:5005'
+    environment:
+      - NODE_ENV=production
+      - SERVICE_HTTP_PORT=3005
+      - DATABASE_URL=postgresql://postgres:Isyawal161104@postgres:5432/inventory-db?schema=public
+      - NATS_SERVER=nats://nats:4222
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    networks:
+      - system_network
+
+  notification-service:
+    image: nexus-notification-service:1.0-early
+    container_name: nexus-notification-service
+    build:
+      context: .
+      dockerfile: apps/notification-service/Dockerfile
+    ports:
+      - '5006:5006'
+    environment:
+      - NODE_ENV=production
+      - SERVICE_HTTP_PORT=3006
+      - NATS_SERVER=nats://nats:4222
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - nats
+      - redis
+    networks:
+      - system_network
+
+  pharmacy-service:
+    image: nexus-pharmacy-service:1.0-early
+    container_name: nexus-pharmacy-service
+    build:
+      context: .
+      dockerfile: apps/pharmacy-service/Dockerfile
+    ports:
+      - '5007:5007'
+    environment:
+      - NODE_ENV=production
+      - SERVICE_HTTP_PORT=3007
+      - DATABASE_URL=postgresql://postgres:Isyawal161104@postgres:5432/pharmacy-db?schema=public
+      - NATS_SERVER=nats://nats:4222
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    networks:
+      - system_network
+
+  staff-service:
+    image: nexus-staff-service:1.0-early
+    container_name: nexus-staff-service
+    build:
+      context: .
+      dockerfile: apps/staff-service/Dockerfile
+    ports:
+      - '5008:5008'
+    environment:
+      - NODE_ENV=production
+      - SERVICE_HTTP_PORT=3008
+      - DATABASE_URL=postgresql://postgres:Isyawal161104@postgres:5432/staff-db?schema=public
+      - NATS_SERVER=nats://nats:4222
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    networks:
+      - system_network
+
+  ward-service:
+    image: nexus-ward-service:1.0-early
+    container_name: nexus-ward-service
+    build:
+      context: .
+      dockerfile: apps/ward-service/Dockerfile
+    ports:
+      - '5009:5009'
+    environment:
+      - NODE_ENV=production
+      - SERVICE_HTTP_PORT=3009
+      - DATABASE_URL=postgresql://postgres:Isyawal161104@postgres:5432/ward-db?schema=public
+      - NATS_SERVER=nats://nats:4222
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    networks:
+      - system_network

@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appointment-service
+  namespace: nexus-service
+  labels:
+    app.kubernetes.io/name: appointment-service
+    app.kubernetes.io/part-of: nexus-healthcare-system
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: appointment-service
+  template:
+    metadata:
+      labels:
+        app: appointment-service
+    spec:
+      nodeSelector:
+        workload: system-service
+      imagePullSecrets:
+        - name: regcred
+      initContainers:
+        - name: db-migration
+          image: docker.io/isyawal16/nexus-appointment-service:1.0-early
+          imagePullPolicy: IfNotPresent
+          command: ['bunx', 'prisma', 'migrate', 'deploy']
+          envFrom:
+            - configMapRef:
+                name: appointment-service-config
+            - secretRef:
+                name: appointment-service-secret
+      containers:
+        - name: appointment-service
+          image: docker.io/isyawal16/nexus-appointment-service:1.0-early
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5001
+              name: http
+            - containerPort: 50051
+              name: grpc
+          envFrom:
+            - configMapRef:
+                name: appointment-service-config
+            - secretRef:
+                name: appointment-service-secret
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '128Mi'
+            limits:
+              cpu: '500m'
+              memory: '512Mi'
+          # readinessProbe:
+          #  httpGet:
+          #    path: /health
+          #    port: 5001
+          #  initialDelaySeconds: 5
+          #  periodSeconds: 10
+          # livenessProbe:
+          #  httpGet:
+          #    path: /health
+          #    port: 5001
+          #  initialDelaySeconds: 15
+          #  periodSeconds: 15

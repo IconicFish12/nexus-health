@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: appointment-service-config
+  namespace: nexus-service
+  labels:
+    app.kubernetes.io/name: appointment-service
+    app.kubernetes.io/part-of: nexus-healthcare-system
+data:
+  SERVICE_HTTP_PORT: '5001'
+  NODE_ENV: 'production'
+  SERVICE_NAME: 'appointment-service'
+  SERVICE_HOST: '0.0.0.0'
+  SERVICE_GRPC_PORT: '50051'
+  GRPC_PORT: '50051'
+  GRPC_HOST: '0.0.0.0'
+  GRPC_MAX_RECEIVE_MESSAGE_LENGTH: '4194304'
+  GRPC_MAX_SEND_MESSAGE_LENGTH: '4194304'
+  GRPC_KEEPALIVE_TIME_MS: '10000'
+  GRPC_KEEPALIVE_TIMEOUT_MS: '5000'
+  NATS_CLIENT_ID: 'appointment-service'
+  NATS_SERVICE_GROUP: 'appointment-service-group'
+  NATS_JETSTREAM_ENABLED: 'true'
+  NATS_STREAM_NAME: 'APTS'
+  NATS_STREAM_SUBJECTS: 'apts.*'
+  NATS_MAX_RECONNECT_ATTEMPTS: '-1'
+  NATS_RECONNECT_TIME_WAIT: '2000'
+  REDIS_PORT: '6379'
+  REDIS_CACHE_DB: '0'
+  REDIS_CACHE_KEY_PREFIX: 'cache:appointment:'
+  REDIS_TLS_ENABLED: 'false'
+  REDIS_CONNECT_TIMEOUT: '10000'
+  REDIS_MAX_RETRIES_PER_REQUEST: '3'
+  DB_HOST: 'appointment-postgres-svc'
+  DB_PORT: '5432'
+  DB_NAME: 'nh-appointment'

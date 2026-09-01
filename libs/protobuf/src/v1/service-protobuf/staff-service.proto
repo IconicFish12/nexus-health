@@ -1,0 +1,106 @@
+syntax = "proto3";
+
+package nexus.staff.v1;
+
+import "google/protobuf/timestamp.proto";
+import "v1/main.proto";
+
+option go_package = "nexus/staff/v1;staffv1";
+
+message Staff {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string role = 4;
+  optional string specialty = 5;
+  string department = 6;
+  optional string contact_number = 7;
+  bool is_active = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+  repeated Shift shifts = 11;
+}
+
+message Shift {
+  string id = 1;
+  string staff_id = 2;
+  int32 day_of_week = 3; // 0 = Monday, 6 = Sunday
+  string start_time = 4; // e.g. "08:00"
+  string end_time = 5;   // e.g. "16:00"
+}
+
+service StaffService {
+  rpc CreateStaff (CreateStaffRequest) returns (CreateStaffResponse);
+  rpc GetStaff (GetStaffRequest) returns (GetStaffResponse);
+  rpc GetStaffByEmail (GetStaffByEmailRequest) returns (GetStaffByEmailResponse);
+  rpc ListStaff (ListStaffRequest) returns (ListStaffResponse);
+  
+  rpc CreateShift (CreateShiftRequest) returns (CreateShiftResponse);
+  rpc ListShiftsByStaff (ListShiftsByStaffRequest) returns (ListShiftsByStaffResponse);
+}
+
+message CreateStaffRequest {
+  string name = 1;
+  string email = 2;
+  string role = 3;
+  optional string specialty = 4;
+  string department = 5;
+  optional string contact_number = 6;
+}
+
+message CreateStaffResponse {
+  Staff staff = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message GetStaffRequest {
+  string id = 1;
+}
+
+message GetStaffResponse {
+  Staff staff = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message GetStaffByEmailRequest {
+  string email = 1;
+}
+
+message GetStaffByEmailResponse {
+  Staff staff = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message ListStaffRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  optional string department = 3;
+  optional string role = 4;
+}
+
+message ListStaffResponse {
+  repeated Staff staff_members = 1;
+  nexus.main.v1.PaginationMeta pagination = 2;
+  nexus.main.v1.Error error = 3;
+}
+
+message CreateShiftRequest {
+  string staff_id = 1;
+  int32 day_of_week = 2;
+  string start_time = 3;
+  string end_time = 4;
+}
+
+message CreateShiftResponse {
+  Shift shift = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message ListShiftsByStaffRequest {
+  string staff_id = 1;
+}
+
+message ListShiftsByStaffResponse {
+  repeated Shift shifts = 1;
+  nexus.main.v1.Error error = 2;
+}

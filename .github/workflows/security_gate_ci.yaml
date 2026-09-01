@@ -1,0 +1,153 @@
+name: 'Security Gate CI Workflow'
+
+on:
+  workflow_call:
+    inputs:
+      enable-iac-scan:
+        description: 'Enable Infrastructure as Code (IaC) scanning'
+        required: false
+        type: boolean
+        default: false
+      enable-dast-scan:
+        description: 'Enable Dynamic Application Security Testing (DAST)'
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      github_pat:
+        description: 'GitHub Personal Access Token or GITHUB_TOKEN'
+        required: false
+
+jobs:
+  secret-scan:
+    name: Secret Leak Detection (Gitleaks)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks Secret Scan
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_pat || secrets.GITHUB_TOKEN }}
+
+  sca-scan:
+    name: Software Composition Analysis (SCA & Config)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Bun setup
+        uses: oven-sh/setup-bun@v2
+
+      - name: Bun dependencies audit
+        run: bun audit || true
+
+      - name: Trivy Repository & Dependency Scan (SCA)
+        uses: aquasecurity/trivy-action@0.36.0
+        with:
+          scan-type: 'fs,config'
+          scan-ref: '.'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
+
+  sast-codeql:
+    name: SAST Code Analysis (CodeQL & Path Filtering)
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Filter microservice changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            api-gateway:
+              - 'apps/api-gateway/**'
+              - 'libs/**'
+            auth-service:
+              - 'apps/auth-service/**'
+              - 'libs/**'
+            appointment-service:
+              - 'apps/appointment-service/**'
+              - 'libs/**'
+            billing-service:
+              - 'apps/billing-service/**'
+              - 'libs/**'
+            emr-service:
+              - 'apps/emr-service/**'
+              - 'libs/**'
+            inventory-service:
+              - 'apps/inventory-service/**'
+              - 'libs/**'
+            notification-service:
+              - 'apps/notification-service/**'
+              - 'libs/**'
+            pharmacy-service:
+              - 'apps/pharmacy-service/**'
+              - 'libs/**'
+            staff-service:
+              - 'apps/staff-service/**'
+              - 'libs/**'
+            ward-service:
+              - 'apps/ward-service/**'
+              - 'libs/**'
+
+      - name: Initialize CodeQL Analysis
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          build-mode: none
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: '/language:javascript-typescript'
+
+  iac-scan:
+    name: Infrastructure as Code Scan (Trivy IaC)
+    if: ${{ inputs.enable-iac-scan }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Trivy IaC Scan (K8s & Dockerfiles)
+        uses: aquasecurity/trivy-action@0.36.0
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
+
+  dast-scan:
+    name: Dynamic Application Security Testing (DAST)
+    if: ${{ inputs.enable-dast-scan }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: DAST Scan Placeholder (e.g. OWASP ZAP / Nuclei)
+        run: |
+          echo "Executing DAST Scan against target environment..."
+          echo "DAST scanner integration ready for tool selection (e.g., OWASP ZAP / Nuclei)."

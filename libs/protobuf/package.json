@@ -1,18 +1,21 @@
 {
   "name": "protobuf",
-  "type": "module",
-  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
   "devDependencies": {
-    "@protobuf-ts/plugin": "^2.11.1",
-    "@types/bun": "latest",
-    "grpc-tools": "^1.13.1",
-    "protoc": "^35.1.0"
+    "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.4",
-    "@grpc/proto-loader": "^0.8.1"
+    "@grpc/proto-loader": "^0.8.1",
+    "@nestjs/config": "^4.0.4",
+    "@nestjs/microservices": "^11.1.28"
   }
 }

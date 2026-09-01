@@ -1,0 +1,55 @@
+name: 'Continuous Delivery Workflow'
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - labeled
+      - closed
+    branches:
+      - main
+      - staging
+
+jobs:
+  default-ci:
+    name: Execute Default CI
+    uses: ./.github/workflows/default_ci.yaml
+    with:
+      node-version: '22'
+      bun-version: 'latest'
+
+  security-gate-ci:
+    name: Execute Security Gate CI
+    needs: [default-ci]
+    uses: ./.github/workflows/security_gate_ci.yaml
+    with:
+      enable-iac-scan: true
+      enable-dast-scan: false
+    secrets:
+      github_pat: ${{ secrets.GITHUB_TOKEN }}
+
+  build-image-ci:
+    name: Execute Build Image CI
+    needs: [security-gate-ci]
+    uses: ./.github/workflows/build_image_ci.yaml
+    with:
+      image-tag: ${{ github.sha }}
+      registry: 'docker.io'
+    secrets:
+      docker_username: ${{ secrets.DOCKER_USERNAME }}
+      docker_password: ${{ secrets.DOCKER_PASSWORD }}
+
+  project-deploy:
+    name: Execute Project Deploy
+    needs: [build-image-ci]
+    uses: ./.github/workflows/project_deploy.yaml
+    with:
+      environment: 'staging'
+      image-tag: ${{ github.sha }}
+    secrets:
+      kubeconfig: ${{ secrets.KUBECONFIG }}

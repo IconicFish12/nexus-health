@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: nexus-service
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: nexus-healthcare-system
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      nodeSelector:
+        workload: system-service
+      containers:
+        - name: api-gateway
+          image: docker.io/isyawal16/nexus-api-gateway:1.0-early
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+              name: http
+            - containerPort: 50050
+              name: grpc
+          envFrom:
+            - configMapRef:
+                name: api-gateway-config
+            - secretRef:
+                name: api-gateway-secret
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '128Mi'
+            limits:
+              cpu: '500m'
+              memory: '512Mi'
+          # readinessProbe:
+          #  httpGet:
+          #    path: /health
+          #    port: 5000
+          #  initialDelaySeconds: 5
+          #  periodSeconds: 10
+          # livenessProbe:
+          #   httpGet:
+          #    path: /health
+          #    port: 5000
+          #  initialDelaySeconds: 15
+          #  periodSeconds: 15

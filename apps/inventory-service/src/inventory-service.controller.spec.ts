@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { InventoryServiceController } from './inventory-service.controller.ts';
-import { InventoryServiceService } from './inventory-service.service.ts';
+import { InventoryServiceController } from './inventory-service.controller';
+import { InventoryServiceService } from './inventory-service.service';
 
 describe('InventoryServiceController', () => {
   let inventoryServiceController: InventoryServiceController;
@@ -11,7 +11,9 @@ describe('InventoryServiceController', () => {
       providers: [InventoryServiceService],
     }).compile();
 
-    inventoryServiceController = app.get<InventoryServiceController>(InventoryServiceController);
+    inventoryServiceController = app.get<InventoryServiceController>(
+      InventoryServiceController,
+    );
   });
 
   describe('root', () => {

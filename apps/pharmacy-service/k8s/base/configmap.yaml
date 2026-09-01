@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pharmacy-service-config
+  namespace: nexus-service
+  labels:
+    app.kubernetes.io/name: pharmacy-service
+    app.kubernetes.io/part-of: nexus-healthcare-system
+data:
+  SERVICE_HTTP_PORT: "5007"
+  NODE_ENV: "production"
+  SERVICE_NAME: "pharmacy-service"
+  SERVICE_HOST: "0.0.0.0"
+  SERVICE_GRPC_PORT: "500057"
+  GRPC_PORT: "500057"
+  GRPC_HOST: "0.0.0.0"
+  GRPC_MAX_RECEIVE_MESSAGE_LENGTH: "4194304"
+  GRPC_MAX_SEND_MESSAGE_LENGTH: "4194304"
+  GRPC_KEEPALIVE_TIME_MS: "10000"
+  GRPC_KEEPALIVE_TIMEOUT_MS: "5000"
+  NATS_CLIENT_ID: "pharmacy-service"
+  NATS_SERVICE_GROUP: "pharmacy-service-group"
+  NATS_JETSTREAM_ENABLED: "true"
+  NATS_STREAM_NAME: "PHR"
+  NATS_STREAM_SUBJECTS: "PHRS.*"
+  NATS_MAX_RECONNECT_ATTEMPTS: "-1"
+  NATS_RECONNECT_TIME_WAIT: "2000"
+  REDIS_PORT: "6379"
+  REDIS_CACHE_DB: "0"
+  REDIS_CACHE_KEY_PREFIX: "cache:pharmacy:"
+  REDIS_TLS_ENABLED: "false"
+  REDIS_CONNECT_TIMEOUT: "10000"
+  REDIS_MAX_RETRIES_PER_REQUEST: "3"
+  DB_HOST: "pharmacy-postgres-svc"
+  DB_PORT: "5432"
+  DB_NAME: "nh-pharmacy"

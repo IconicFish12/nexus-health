@@ -1,0 +1,53 @@
+name: 'Project Deploy Workflow'
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Deployment environment (e.g. staging, production)'
+        required: true
+        type: string
+      image-tag:
+        description: 'Docker image tag to deploy'
+        required: true
+        type: string
+    secrets:
+      kubeconfig:
+        description: 'Kubeconfig file content or base64 data'
+        required: false
+
+jobs:
+  deploy:
+    name: Deploy Services to Target Environment
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl CLI
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'latest'
+
+      - name: Configure Kubeconfig
+        if: ${{ secrets.kubeconfig != '' }}
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.kubeconfig }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Execute Deployment Rollout
+        run: |
+          echo "Deploying nexus-healthcare-system microservices to environment: ${{ inputs.environment }}"
+          echo "Image tag: ${{ inputs.image-tag }}"
+          
+          # If Kubeconfig is present, apply k8s manifests
+          if [ -d "k8s" ] && [ -n "${{ secrets.kubeconfig }}" ]; then
+            kubectl apply -f k8s/ --recursive
+            kubectl set image deployment/api-gateway api-gateway=nexus-api-gateway:${{ inputs.image-tag }} --namespace=${{ inputs.environment }} || true
+            kubectl rollout status deployment/api-gateway --namespace=${{ inputs.environment }} || true
+          else
+            echo "Kubeconfig or k8s manifests pending target setup. Deployment interface ready."
+          fi

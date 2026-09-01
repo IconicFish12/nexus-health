@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service-svc
+  namespace: nexus-service
+  labels:
+    app.kubernetes.io/name: notification-service
+    app.kubernetes.io/part-of: nexus-healthcare-system
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5006
+      targetPort: 5006
+      name: http
+    - port: 500056
+      targetPort: 500056
+      name: grpc
+  selector:
+    app: notification-service

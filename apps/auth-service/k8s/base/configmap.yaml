@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-service-config
+  namespace: nexus-service
+  labels:
+    app.kubernetes.io/name: auth-service
+    app.kubernetes.io/part-of: nexus-healthcare-system
+data:
+  SERVICE_HTTP_PORT: "5002"
+  NODE_ENV: "production"
+  SERVICE_NAME: "auth-service"
+  SERVICE_HOST: "0.0.0.0"
+  SERVICE_GRPC_PORT: "500052"
+  GRPC_PORT: "500052"
+  GRPC_HOST: "0.0.0.0"
+  GRPC_MAX_RECEIVE_MESSAGE_LENGTH: "4194304"
+  GRPC_MAX_SEND_MESSAGE_LENGTH: "4194304"
+  GRPC_KEEPALIVE_TIME_MS: "10000"
+  GRPC_KEEPALIVE_TIMEOUT_MS: "5000"
+  NATS_CLIENT_ID: "auth-service"
+  NATS_SERVICE_GROUP: "auth-service-group"
+  NATS_JETSTREAM_ENABLED: "true"
+  NATS_STREAM_NAME: "AUTH"
+  NATS_STREAM_SUBJECTS: "auth.*"
+  NATS_MAX_RECONNECT_ATTEMPTS: "-1"
+  NATS_RECONNECT_TIME_WAIT: "2000"
+  REDIS_PORT: "6379"
+  REDIS_CACHE_DB: "0"
+  REDIS_CACHE_KEY_PREFIX: "cache:auth:"
+  REDIS_TLS_ENABLED: "false"
+  REDIS_CONNECT_TIMEOUT: "10000"
+  REDIS_MAX_RETRIES_PER_REQUEST: "3"
+  DB_HOST: "auth-postgres-svc"
+  DB_PORT: "5432"
+  DB_NAME: "nh-auth"

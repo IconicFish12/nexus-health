@@ -1,0 +1,32 @@
+name: 'Feature & Dev Branch Workflow'
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+      - '**/feature'
+      - '**/bugfix'
+
+  push:
+    branches:
+      - dev
+      - '**/feature'
+
+jobs:
+  default-ci:
+    name: Execute Default CI
+    uses: ./.github/workflows/default_ci.yaml
+    with:
+      node-version: '22'
+      bun-version: 'latest'
+
+  security-gate-ci:
+    name: Execute Security Gate CI
+    needs: [default-ci]
+    uses: ./.github/workflows/security_gate_ci.yaml
+    with:
+      enable-iac-scan: false
+      enable-dast-scan: false
+    secrets:
+      github_pat: ${{ secrets.GITHUB_TOKEN }}

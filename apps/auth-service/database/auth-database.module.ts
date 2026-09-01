@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { AuthDatabaseService } from './auth-database.service.ts';
+import { AuthDatabaseService } from './auth-database.service';
 
 @Module({
-  providers: [AuthDatabaseService]
+  providers: [AuthDatabaseService],
 })
 export class AuthDatabaseModule {}

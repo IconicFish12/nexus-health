@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: emr-service-svc
+  namespace: nexus-service
+  labels:
+    app.kubernetes.io/name: emr-service
+    app.kubernetes.io/part-of: nexus-healthcare-system
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5004
+      targetPort: 5004
+      name: http
+    - port: 500054
+      targetPort: 500054
+      name: grpc
+  selector:
+    app: emr-service

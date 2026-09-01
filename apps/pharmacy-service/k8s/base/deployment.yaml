@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pharmacy-service
+  namespace: nexus-service
+  labels:
+    app.kubernetes.io/name: pharmacy-service
+    app.kubernetes.io/part-of: nexus-healthcare-system
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: pharmacy-service
+  template:
+    metadata:
+      labels:
+        app: pharmacy-service
+    spec:
+      initContainers:
+        - name: db-migration
+          image: nexus-pharmacy-service:1.0-early
+          imagePullPolicy: IfNotPresent
+          command: ['bunx', 'prisma', 'migrate', 'deploy']
+          envFrom:
+            - configMapRef:
+                name: pharmacy-service-config
+            - secretRef:
+                name: pharmacy-service-secret
+      containers:
+        - name: pharmacy-service
+          image: nexus-pharmacy-service:1.0-early
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5007
+              name: http
+            - containerPort: 500057
+              name: grpc
+          envFrom:
+            - configMapRef:
+                name: nexus-common-config
+            - configMapRef:
+                name: pharmacy-service-config
+            - secretRef:
+                name: pharmacy-service-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5007
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5007
+            initialDelaySeconds: 15
+            periodSeconds: 15

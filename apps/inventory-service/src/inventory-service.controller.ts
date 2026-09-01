@@ -1,9 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
-import { InventoryServiceService } from './inventory-service.service.ts';
+import { InventoryServiceService } from './inventory-service.service';
 
 @Controller()
 export class InventoryServiceController {
-  constructor(private readonly inventoryServiceService: InventoryServiceService) {}
+  constructor(
+    private readonly inventoryServiceService: InventoryServiceService,
+  ) {}
 
   @Get()
   getHello(): string {

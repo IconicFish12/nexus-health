@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthDatabaseService } from './auth-database.service.ts';
+import { AuthDatabaseService } from './auth-database.service';
 
 describe('AuthDatabaseService', () => {
   let service: AuthDatabaseService;

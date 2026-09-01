@@ -4,10 +4,75 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+    provider               = "prisma-client"
+    output                 = "../generated/prisma"
+    runtime                = "bun"
+    moduleFormat           = "esm"
+    generatedFileExtension = "ts"
+    importFileExtension    = "ts"
+    binaryTargets          = ["native", "rhel-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "postgresql"
+    provider = "postgresql"
+}
+
+enum PrescriptionStatus {
+    PENDING
+    PARTIALLY_DISPENSED
+    DISPENSED
+    CANCELLED
+}
+
+model Drug {
+  id                  String   @id @default(uuid())
+  name                String
+  genericName         String
+  drugClass           String
+  dosageForms         String[] // ["tablet", "injection", "syrup"]
+  unitPrice           Decimal  @db.Decimal(10, 2)
+  quantityOnHand      Int      @default(0)
+  reorderLevel        Int
+  isControlled        Boolean  @default(false) // controlled substance flag
+  interactionWarnings String[] // drug names that interact
+  batchCode           String
+  expirationDate      DateTime
+  updatedAt           DateTime @updatedAt
+  prescriptionItems   PrescriptionItem[]
+
+  @@index([name])
+}
+
+model Prescription {
+  id        String             @id @default(uuid())
+  patientId String             // ref — lives in nh_emr
+  doctorId  String             // ref — lives in nh_staff
+  emrId     String             // ref — lives in nh_emr
+  status    PrescriptionStatus @default(PENDING)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  items     PrescriptionItem[]
+}
+
+model PrescriptionItem {
+  id             String       @id @default(uuid())
+  prescription   Prescription @relation(fields: [prescriptionId], references: [id])
+  prescriptionId String
+  drug           Drug         @relation(fields: [drugId], references: [id])
+  drugId         String
+  dosageInstructions String
+  qtyPrescribed  Int
+  qtyDispensed   Int          @default(0)
+  dispensedAt    DateTime?
+  dispensedBy    String?      // pharmacist staff ID ref
+}
+
+model OutboxEvent {
+  id        String   @id @default(uuid())
+  eventType String
+  payload   Json
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([published, createdAt])
 }

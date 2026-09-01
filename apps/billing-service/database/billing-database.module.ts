@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { BillingDatabaseService } from './billing-database.service.ts';
+import { BillingDatabaseService } from './billing-database.service';
 
 @Module({
-  providers: [BillingDatabaseService]
+  providers: [BillingDatabaseService],
+  exports: [BillingDatabaseService],
 })
 export class BillingDatabaseModule {}

@@ -1,9 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
-import { PharmacyServiceService } from './pharmacy-service.service.ts';
+import { PharmacyServiceService } from './pharmacy-service.service';
 
 @Controller()
 export class PharmacyServiceController {
-  constructor(private readonly pharmacyServiceService: PharmacyServiceService) {}
+  constructor(
+    private readonly pharmacyServiceService: PharmacyServiceService,
+  ) {}
 
   @Get()
   getHello(): string {

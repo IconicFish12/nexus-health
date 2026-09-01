@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package nexus.billing.v1;
+
+import "google/protobuf/timestamp.proto";
+import "v1/main.proto";
+
+option go_package = "nexus/billing/v1;billingv1";
+
+enum InvoiceStatus {
+  INVOICE_STATUS_UNSPECIFIED       = 0;
+  INVOICE_STATUS_UNPAID            = 1;
+  INVOICE_STATUS_PAID              = 2;
+  INVOICE_STATUS_PENDING_INSURANCE = 3;
+  INVOICE_STATUS_PARTIALLY_PAID    = 4;
+  INVOICE_STATUS_CANCELLED         = 5;
+}
+
+enum ClaimStatus {
+  CLAIM_STATUS_UNSPECIFIED = 0;
+  CLAIM_STATUS_SUBMITTED   = 1;
+  CLAIM_STATUS_APPROVED    = 2;
+  CLAIM_STATUS_REJECTED    = 3;
+  CLAIM_STATUS_PARTIAL     = 4;
+}
+
+message InvoiceItem {
+  string id = 1;
+  string invoice_id = 2;
+  string description = 3;
+  double amount = 4;
+  string category = 5; // "CONSULTATION", "BED_STAY", "PHARMACY"
+}
+
+message InsuranceClaim {
+  string id = 1;
+  string invoice_id = 2;
+  string provider = 3;
+  string policy_no = 4;
+  double claim_amount = 5;
+  ClaimStatus status = 6;
+  google.protobuf.Timestamp submitted_at = 7;
+  optional google.protobuf.Timestamp resolved_at = 8;
+}
+
+message Invoice {
+  string id = 1;
+  string patient_id = 2;
+  string admission_id = 3;
+  double total_amount = 4;
+  double insurance_covered = 5;
+  InvoiceStatus status = 6;
+  repeated InvoiceItem items = 7;
+  optional InsuranceClaim insurance_claim = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+}
+
+service BillingService {
+  rpc CreateInvoice (CreateInvoiceRequest) returns (CreateInvoiceResponse);
+  rpc GetInvoice (GetInvoiceRequest) returns (GetInvoiceResponse);
+  rpc ListInvoices (ListInvoicesRequest) returns (ListInvoicesResponse);
+  rpc UpdateInvoiceStatus (UpdateInvoiceStatusRequest) returns (UpdateInvoiceStatusResponse);
+  rpc SubmitInsuranceClaim (SubmitInsuranceClaimRequest) returns (SubmitInsuranceClaimResponse);
+  rpc ResolveInsuranceClaim (ResolveInsuranceClaimRequest) returns (ResolveInsuranceClaimResponse);
+}
+
+message CreateInvoiceItemInput {
+  string description = 1;
+  double amount = 2;
+  string category = 3;
+}
+
+message CreateInvoiceRequest {
+  string patient_id = 1;
+  string admission_id = 2;
+  repeated CreateInvoiceItemInput items = 3;
+}
+
+message CreateInvoiceResponse {
+  Invoice invoice = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message GetInvoiceRequest {
+  string id = 1;
+}
+
+message GetInvoiceResponse {
+  Invoice invoice = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message ListInvoicesRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  optional string patient_id = 3;
+  optional InvoiceStatus status = 4;
+}
+
+message ListInvoicesResponse {
+  repeated Invoice invoices = 1;
+  nexus.main.v1.PaginationMeta pagination = 2;
+  nexus.main.v1.Error error = 3;
+}
+
+message UpdateInvoiceStatusRequest {
+  string id = 1;
+  InvoiceStatus status = 2;
+  optional double paid_amount = 3;
+}
+
+message UpdateInvoiceStatusResponse {
+  Invoice invoice = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message SubmitInsuranceClaimRequest {
+  string invoice_id = 1;
+  string provider = 2;
+  string policy_no = 3;
+  double claim_amount = 4;
+}
+
+message SubmitInsuranceClaimResponse {
+  InsuranceClaim claim = 1;
+  nexus.main.v1.Error error = 2;
+}
+
+message ResolveInsuranceClaimRequest {
+  string claim_id = 1;
+  ClaimStatus status = 2;
+  optional double approved_amount = 3;
+}
+
+message ResolveInsuranceClaimResponse {
+  InsuranceClaim claim = 1;
+  nexus.main.v1.Error error = 2;
+}
